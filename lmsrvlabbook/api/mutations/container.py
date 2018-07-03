@@ -51,7 +51,7 @@ class StartDevTool(graphene.relay.ClientIDMutation):
         lb = LabBook(author=get_logged_in_author())
         lb.from_name(username, owner, labbook_name)
 
-        lb_ip, _ = ContainerOperations.get_labbook_ip(lb, username)
+        lb_ip = ContainerOperations.get_labbook_ip(lb, username)
         lb_port = 8888
         lb_endpoint = f'http://{lb_ip}:{lb_port}'
 
