@@ -140,8 +140,7 @@ class StopContainer(graphene.relay.ClientIDMutation):
         username = get_logged_in_username()
         lb = LabBook(author=get_logged_in_author())
         lb.from_name(username, owner, labbook_name)
-
-        lb_ip, _ = ContainerOperations.get_labbook_ip(lb, username)
+        lb_ip = ContainerOperations.get_labbook_ip(lb, username)
 
         stop_labbook_monitor(lb, username)
         lb, stopped = ContainerOperations.stop_container(labbook=lb, username=username)
