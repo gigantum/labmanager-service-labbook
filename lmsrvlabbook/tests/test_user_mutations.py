@@ -45,7 +45,7 @@ class TestUserIdentityMutations(object):
 
         snapshot.assert_match(fixture_working_dir[2].execute(query))
 
-        identity_file = os.path.join(fixture_working_dir[1], '.labmanager', 'identity', 'user.json')
+        identity_file = os.path.join(fixture_working_dir[1], '.labmanager', 'identity', 'cached_id_jwt')
         assert os.path.exists(identity_file) is True
 
         query = """
@@ -60,5 +60,4 @@ class TestUserIdentityMutations(object):
 
         snapshot.assert_match(fixture_working_dir[2].execute(query))
 
-        identity_file = os.path.join(fixture_working_dir[1], '.labmanager', 'identity', 'user.json')
         assert os.path.exists(identity_file) is False

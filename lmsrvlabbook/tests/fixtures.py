@@ -36,6 +36,7 @@ from lmcommon.configuration import Configuration, get_docker_client
 from lmcommon.auth.identity import get_identity_manager
 from lmcommon.labbook import LabBook
 from lmsrvcore.middleware import LabBookLoaderMiddleware, error_middleware
+from lmsrvcore.tests.fixtures import insert_cached_identity
 
 from lmcommon.fixtures import (ENV_UNIT_TEST_REPO, ENV_UNIT_TEST_REV, ENV_UNIT_TEST_BASE)
 from lmcommon.container.container import ContainerOperations
@@ -61,6 +62,7 @@ def _create_temp_work_dir(lfs_enabled: bool = True):
     config.config["git"]["lfs_enabled"] = lfs_enabled
     # Set the auth0 client to the test client (only contains 1 test user and is partitioned from prod)
     config.config["auth"]["audience"] = "io.gigantum.api.dev"
+    config.config["auth"]["client_id"] = "Z6Wl854wqCjNY0D4uJx8SyPyySyfKmAy"
     config_file = os.path.join(temp_dir, "temp_config.yaml")
     config.save(config_file)
     os.environ['HOST_WORK_DIR'] = temp_dir
@@ -89,13 +91,7 @@ def fixture_working_dir():
     config_file, temp_dir = _create_temp_work_dir()
 
     # Create user identity
-    user_dir = os.path.join(temp_dir, '.labmanager', 'identity')
-    os.makedirs(user_dir)
-    with open(os.path.join(user_dir, 'user.json'), 'wt') as user_file:
-        json.dump({"username": "default",
-                   "email": "jane@doe.com",
-                   "given_name": "Jane",
-                   "family_name": "Doe"}, user_file)
+    insert_cached_identity(temp_dir)
 
     # Create test client
     schema = graphene.Schema(query=LabbookQuery, mutation=LabbookMutations)
@@ -127,13 +123,7 @@ def fixture_working_dir_lfs_disabled():
     config_file, temp_dir = _create_temp_work_dir(lfs_enabled=False)
 
     # Create user identity
-    user_dir = os.path.join(temp_dir, '.labmanager', 'identity')
-    os.makedirs(user_dir)
-    with open(os.path.join(user_dir, 'user.json'), 'wt') as user_file:
-        json.dump({"username": "default",
-                   "email": "jane@doe.com",
-                   "given_name": "Jane",
-                   "family_name": "Doe"}, user_file)
+    insert_cached_identity(temp_dir)
 
     # Create test client
     schema = graphene.Schema(query=LabbookQuery, mutation=LabbookMutations)
@@ -167,13 +157,7 @@ def fixture_working_dir_env_repo_scoped():
     config_file, temp_dir = _create_temp_work_dir()
 
     # Create user identity
-    user_dir = os.path.join(temp_dir, '.labmanager', 'identity')
-    os.makedirs(user_dir)
-    with open(os.path.join(user_dir, 'user.json'), 'wt') as user_file:
-        json.dump({"username": "default",
-                   "email": "jane@doe.com",
-                   "given_name": "Jane",
-                   "family_name": "Doe"}, user_file)
+    insert_cached_identity(temp_dir)
 
     # Create test client
     schema = graphene.Schema(query=LabbookQuery, mutation=LabbookMutations)
@@ -212,13 +196,7 @@ def fixture_working_dir_populated_scoped():
     config_file, temp_dir = _create_temp_work_dir()
 
     # Create user identity
-    user_dir = os.path.join(temp_dir, '.labmanager', 'identity')
-    os.makedirs(user_dir)
-    with open(os.path.join(user_dir, 'user.json'), 'wt') as user_file:
-        json.dump({"username": "default",
-                   "email": "jane@doe.com",
-                   "given_name": "Jane",
-                   "family_name": "Doe"}, user_file)
+    insert_cached_identity(temp_dir)
 
     # Create test client
     schema = graphene.Schema(query=LabbookQuery, mutation=LabbookMutations)
@@ -271,13 +249,7 @@ def build_image_for_jupyterlab():
     config_file, temp_dir = _create_temp_work_dir()
 
     # Create user identity
-    user_dir = os.path.join(temp_dir, '.labmanager', 'identity')
-    os.makedirs(user_dir)
-    with open(os.path.join(user_dir, 'user.json'), 'wt') as user_file:
-        json.dump({"username": "unittester",
-                   "email": "unittester@test.com",
-                   "given_name": "unittester",
-                   "family_name": "tester"}, user_file)
+    insert_cached_identity(temp_dir)
 
     # Create test client
     schema = graphene.Schema(query=LabbookQuery, mutation=LabbookMutations)
@@ -303,7 +275,7 @@ def build_image_for_jupyterlab():
             # Create a labook
             lb = LabBook(config_file)
             lb.new(name="containerunittestbook", description="Testing docker building.",
-                   owner={"username": "unittester"})
+                   owner={"username": "unittester"}, username="default")
 
             # Create Component Manager
             cm = ComponentManager(lb)
@@ -316,7 +288,7 @@ def build_image_for_jupyterlab():
             docker_client = get_docker_client()
 
             try:
-                lb, docker_image_id = ContainerOperations.build_image(labbook=lb, username="unittester")
+                lb, docker_image_id = ContainerOperations.build_image(labbook=lb, username="default")
 
                 yield lb, ib, docker_client, docker_image_id, client, "unittester"
 

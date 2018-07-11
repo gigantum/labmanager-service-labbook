@@ -72,7 +72,7 @@ class TestUserIdentityQueries(object):
         # Delete the stored user context
         flask.g.user_obj = None
         user_dir = os.path.join(fixture_working_dir[1], '.labmanager', 'identity')
-        os.remove(os.path.join(user_dir, 'user.json'))
+        os.remove(os.path.join(user_dir, 'cached_id_jwt'))
 
         # Run query
         snapshot.assert_match(fixture_working_dir[2].execute(query))
@@ -94,8 +94,9 @@ class TestUserIdentityQueries(object):
         # Delete the stored user context
         flask.g.user_obj = None
         flask.g.access_token = "adsfasdfasdfasdfasdf"
+        flask.g.id_token = "gfdhfghjghfjhgfghj"
         user_dir = os.path.join(fixture_working_dir[1], '.labmanager', 'identity')
-        os.remove(os.path.join(user_dir, 'user.json'))
+        os.remove(os.path.join(user_dir, 'cached_id_jwt'))
 
         # Run query
         snapshot.assert_match(fixture_working_dir[2].execute(query))

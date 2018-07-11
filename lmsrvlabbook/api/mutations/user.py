@@ -23,7 +23,7 @@ import graphene
 
 from lmsrvcore.api.objects.user import UserIdentity
 
-from lmcommon.configuration import Configuration
+from lmsrvcore.auth.identity import get_identity_manager_instance
 from lmcommon.logging import LMLogger
 
 logger = LMLogger.get_logger()
@@ -37,16 +37,18 @@ class RemoveUserIdentity(graphene.relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, input, client_mutation_id=None):
-        # Check if there is a local user identity, remove if needed
-        identity_file = os.path.join(Configuration().config['git']['working_directory'],
-                                     '.labmanager', 'identity', 'user.json')
-        if os.path.exists(identity_file):
-            os.remove(identity_file)
-        else:
-            # Does not exist
-            logger.warning("Attempted to remove user identity, but no identity is stored locally.")
+        # Call the logout method to remove any locally stored data
+        get_identity_manager_instance().logout()
 
-        # Wipe current user from session
+        # Remove user's git creds
+        git_cred_file = os.path.expanduser(os.path.join('~', '.git-credentials'))
+        if os.path.exists(git_cred_file):
+            os.remove(git_cred_file)
+            logger.info("Removed git credentials on logout")
+
+        # Wipe current user from request context
         flask.g.user_obj = None
+        flask.g.id_token = None
+        flask.g.access_token = None
 
         return RemoveUserIdentity(user_identity_edge=UserIdentity())

@@ -116,7 +116,7 @@ class TestContainerMutations(object):
         except:
             try:
                 # Mutation failed. Container *might* have stopped, but try to stop it just in case
-                build_image_for_jupyterlab[2].containers.get('gmlb-unittester-unittester-containerunittestbook').stop(timeout=4)
+                build_image_for_jupyterlab[2].containers.get('gmlb-default-unittester-containerunittestbook').stop(timeout=4)
             except:
                 # Make a best effort
                 pass
@@ -124,7 +124,7 @@ class TestContainerMutations(object):
         finally:
             try:
                 # Remove the container.
-                build_image_for_jupyterlab[2].containers.get('gmlb-unittester-unittester-containerunittestbook').remove()
+                build_image_for_jupyterlab[2].containers.get('gmlb-default-unittester-containerunittestbook').remove()
             except:
                 # Make a best effort
                 pass
@@ -134,7 +134,7 @@ class TestContainerMutations(object):
         """Test listing labbooks"""
         # Start the container
         lb, container_id, port_maps = ContainerOperations.start_container(build_image_for_jupyterlab[0],
-                                                                          username='unittester')
+                                                                          username='default')
 
         try:
             lb = build_image_for_jupyterlab[0]

@@ -37,9 +37,8 @@ class TestUserAuthHelpers(object):
         assert user.family_name == "Doe"
 
     def test_get_logged_in_user_cached(self, fixture_working_dir_with_cached_user):
-        """Test getting identity manager in a flask app"""
-        # Fake a token
-        flask.g.access_token = "asioauhsdfikollhasdfioluasdlkfbjxclmjvkbdwklurfghaisudfhbasilkdfbaiwulsfbklsadbvf"
+        """Test getting identity after it has been initialized on first query in a a request"""
+        flask.g.user_obj = None
 
         user = get_logged_in_user()
         assert user.username == "default"
@@ -47,13 +46,10 @@ class TestUserAuthHelpers(object):
         assert user.given_name == "Jane"
         assert user.family_name == "Doe"
 
-        # User should now be loaded into redis
-        client = redis.StrictRedis(db=4)
-        key = flask.g.access_token[0::6]
-        assert "default" == client.hget(key, "username").decode()
-        assert "jane@doe.com" == client.hget(key, "email").decode()
-        assert "Jane" == client.hget(key, "given_name").decode()
-        assert "Doe" == client.hget(key, "family_name").decode()
+        assert flask.g.user_obj == user
+
+        user2 = get_logged_in_user()
+        assert user == user2
 
     def test_get_logged_in_username(self, fixture_working_dir_with_cached_user):
         """Test authorization middlewhere when loading a user exists locally"""
