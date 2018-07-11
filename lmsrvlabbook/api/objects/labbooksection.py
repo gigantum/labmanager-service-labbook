@@ -30,6 +30,8 @@ from lmsrvcore.api.connections import ListBasedConnection
 
 from lmsrvlabbook.api.objects.labbookfile import LabbookFavorite, LabbookFile
 from lmsrvlabbook.api.connections.labbookfileconnection import LabbookFileConnection, LabbookFavoriteConnection
+import redis
+import json
 
 logger = LMLogger.get_logger()
 
@@ -106,8 +108,20 @@ class LabbookSection(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRe
 
     def helper_resolve_all_files(self, labbook, kwargs):
         """Helper method to populate the LabbookFileConnection"""
-        # Get all files and directories, with the exception of anything in .git or .gigantum
-        edges = labbook.walkdir(section=self.section, show_hidden=False)
+        # Check if file info has been cached
+        redis_conn = redis.Redis(db=5)
+        cache_key = f"FILE_LIST_CACHE|{labbook.key}|{self.section}"
+        if redis_conn.exists(cache_key):
+            # Load from cache
+            edges = json.loads(redis_conn.get(cache_key).decode("utf-8"))
+            redis_conn.expire(cache_key, 5)
+        else:
+            # Load from disk and cache
+            # Get all files and directories, with the exception of anything in .git or .gigantum
+            edges = labbook.walkdir(section=self.section, show_hidden=False)
+            redis_conn.set(cache_key, json.dumps(edges))
+            redis_conn.expire(cache_key, 5)
+
         # Generate naive cursors
         cursors = [base64.b64encode("{}".format(cnt).encode("UTF-8")).decode("UTF-8") for cnt, x in enumerate(edges)]
 
