@@ -119,8 +119,8 @@ class StartContainer(graphene.relay.ClientIDMutation):
         lb = LabBook(author=get_logged_in_author())
         lb.from_name(username, owner, labbook_name)
 
-        lb, container_id, ports = ContainerOperations.start_container(labbook=lb, username=username)
-        logger.info(f'Started new {lb} container ({container_id}) with ports {ports}')
+        lb, container_id = ContainerOperations.start_container(labbook=lb, username=username)
+        logger.info(f'Started new {lb} container ({container_id})')
 
         return StartContainer(environment=Environment(owner=owner, name=labbook_name))
 

@@ -20,6 +20,7 @@
 import pytest
 import getpass
 import time
+import pprint
 import subprocess
 
 from lmsrvlabbook.tests.fixtures import fixture_working_dir, fixture_working_dir_env_repo_scoped, \
@@ -75,6 +76,7 @@ class TestContainerMutations(object):
                }
                """
             r = build_image_for_jupyterlab[4].execute(start_query)
+            pprint.pprint(r)
             assert r['data']['startContainer']['environment']['imageStatus'] == 'EXISTS'
             assert r['data']['startContainer']['environment']['containerStatus'] == 'RUNNING'
 
@@ -129,11 +131,12 @@ class TestContainerMutations(object):
                 # Make a best effort
                 pass
 
+
     @pytest.mark.skipif(getpass.getuser() == 'circleci', reason="Cannot run this networking test in CircleCI environment")
     def test_start_jupyterlab(self, build_image_for_jupyterlab):
         """Test listing labbooks"""
         # Start the container
-        lb, container_id, port_maps = ContainerOperations.start_container(build_image_for_jupyterlab[0],
+        lb, container_id = ContainerOperations.start_container(build_image_for_jupyterlab[0],
                                                                           username='default')
 
         try:

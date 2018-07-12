@@ -293,7 +293,6 @@ def build_image_for_jupyterlab():
                 yield lb, ib, docker_client, docker_image_id, client, "unittester"
 
             finally:
-                shutil.rmtree(lb.root_dir)
                 try:
                     docker_client.containers.get(docker_image_id).stop()
                     docker_client.containers.get(docker_image_id).remove()
@@ -304,6 +303,8 @@ def build_image_for_jupyterlab():
                     docker_client.images.remove(docker_image_id, force=True, noprune=False)
                 except:
                     pass
+
+                shutil.rmtree(lb.root_dir)
 
 
 @pytest.fixture
