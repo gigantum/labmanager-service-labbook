@@ -28,7 +28,7 @@ import flask
 from flask_cors import CORS, cross_origin
 import redis
 import blueprint
-import time
+
 
 from lmcommon.configuration import Configuration
 from lmcommon.logging import LMLogger

@@ -124,18 +124,14 @@ class TestEnvironmentMutations(object):
         assert r['data']['labbook']['backgroundJobs'][0]['status'], "Background Jobs status query should not be None"
         pprint.pprint(r)
 
-
         # Wait for build to succeed for up to TIMEOUT_MAX seconds
         success = False
         for _ in range(TIMEOUT_MAX):
             result = fixture_working_dir_env_repo_scoped[2].execute(query)
-
             if result['data']['labbook']['environment']['imageStatus'] == 'EXISTS':
                 success = True
                 break
-
             assert result['data']['labbook']['environment']['imageStatus'] == 'BUILD_IN_PROGRESS'
-
             time.sleep(1)
 
         r = fixture_working_dir_env_repo_scoped[2].execute(get_bg_jobs_query)

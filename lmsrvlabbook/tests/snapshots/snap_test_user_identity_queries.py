@@ -31,7 +31,7 @@ snapshots['TestUserIdentityQueries.test_no_logged_in_user 1'] = {
                     'line': 4
                 }
             ],
-            'message': "({'code': 'missing_token', 'description': 'JWT must be provided to authenticate user if no local stored identity is available'}, 401)"
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)"
         }
     ]
 }
@@ -56,7 +56,7 @@ snapshots['TestUserIdentityQueries.test_invalid_token 1'] = {
                     'line': 4
                 }
             ],
-            'message': "('Error decoding token headers.', 401)"
+            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)"
         }
     ]
 }

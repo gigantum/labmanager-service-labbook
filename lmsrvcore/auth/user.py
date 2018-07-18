@@ -18,57 +18,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import flask
-import redis
-import os
-import base64
 
 from lmcommon.logging import LMLogger
+from lmcommon.auth.user import User
 from lmcommon.gitlib.git import GitAuthor
 from lmsrvcore.auth.identity import get_identity_manager_instance
-from lmcommon.auth.identity import User
 
 
-def get_logged_in_user():
+def get_logged_in_user() -> User:
     """A method to get the current logged in User object"""
     # Check for user in redis cache
     access_token = flask.g.get('access_token', None)
+    id_token = flask.g.get('id_token', None)
 
-    if access_token:
-        # Build unique key from the bearer token
-        key = access_token[0::6]
+    request_scoped_user = flask.g.get('user_obj', None)
+    if not request_scoped_user:
+        request_scoped_user = get_identity_manager_instance().get_user_profile(access_token, id_token)
+        flask.g.user_obj = request_scoped_user
 
-        # Get a redis client
-        client = flask.g.get('redis_client', None)
-        if not client:
-            client = redis.StrictRedis(db=4)
-            flask.g.redis_client = client
-
-        # Check if user data is cached
-        if client.exists(key):
-            # Load user data from redis
-            user = User()
-            user.username = client.hget(key, "username").decode()
-            user.email = client.hget(key, "email").decode()
-            user.given_name = client.hget(key, "given_name").decode()
-            user.family_name = client.hget(key, "family_name").decode()
-
-        else:
-            # User not loaded yet, so get it from the identity manager
-            user = get_identity_manager_instance().get_user_profile(access_token)
-
-            # Save to redis
-            client.hset(key, "username", user.username)
-            client.hset(key, "email", user.email)
-            client.hset(key, "given_name", user.given_name)
-            client.hset(key, "family_name", user.family_name)
-
-            # Set a TTL of 5 minutes. This will auto-delete the key so the identity will be re-queried
-            client.expire(key, 60 * 5)
-    else:
-        # No access token, so assume running locally or malformed request and force a full load from manager
-        user = get_identity_manager_instance().get_user_profile(access_token)
-
-    return user
+    return request_scoped_user
 
 
 def get_logged_in_username():

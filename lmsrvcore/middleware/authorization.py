@@ -38,10 +38,11 @@ class AuthorizationMiddleware(object):
 
             # Save token to the request context for future use (e.g. look up a user's profile information if needed)
             flask.g.access_token = token
+            flask.g.id_token = info.context.headers.get("Identity", None)
 
             # Check if you are authenticated
             try:
-                self.identity_mgr.is_authenticated(token)
+                self.identity_mgr.is_authenticated(token, flask.g.id_token)
             except AuthenticationError:
                 raise AuthenticationError("User not authenticated", 401)
 

@@ -63,7 +63,7 @@ class TestLabBookServiceQueries(object):
         query = """
                 {
                 labbookList{
-                    localLabbooks(sort: "az") {
+                    localLabbooks(orderBy: "name") {
                         edges {
                             node {
                                 id
@@ -86,7 +86,7 @@ class TestLabBookServiceQueries(object):
         query = """
                 {
                 labbookList{
-                    localLabbooks(sort: "az", reverse: true) {
+                    localLabbooks(orderBy: "name", sort: "asc") {
                         edges {
                             node {
                                 id
@@ -109,7 +109,7 @@ class TestLabBookServiceQueries(object):
         query = """
                 {
                 labbookList{
-                    localLabbooks(sort: "created_on") {
+                    localLabbooks(orderBy: "created_on") {
                         edges {
                             node {
                                 id
@@ -133,7 +133,7 @@ class TestLabBookServiceQueries(object):
         query = """
                 {
                 labbookList{
-                    localLabbooks(sort: "modified_on") {
+                    localLabbooks(orderBy: "modified_on") {
                         edges {
                             node {
                                 id
