@@ -27,7 +27,7 @@ import graphene
 from lmcommon.configuration import Configuration, get_docker_client
 from lmcommon.container.container import ContainerOperations
 from lmcommon.dispatcher import (Dispatcher, jobs)
-from lmcommon.labbook import LabBook
+from lmcommon.labbook import LabBook, from_remote
 from lmcommon.logging import LMLogger
 from lmcommon.files import FileOperations
 from lmcommon.imagebuilder import ImageBuilder
@@ -377,8 +377,16 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
 
         mgr = GitLabManager(default_remote, admin_service, token)
         mgr.configure_git_credentials(default_remote, username)
+        collaborators = [collab[1] for collab in mgr.get_collaborators(owner, labbook_name)]
+        is_collab = any([username == c for c in collaborators])
 
-        lb.from_remote(remote_url, username, owner, labbook_name)
+        # IF user is collaborator, then clone in order to support collaboration
+        # ELSE, this means we are cloning a public repo and can't push back
+        #       so we change to owner to the given user so they can (re)publish
+        #       and do whatever with it.
+        make_owner = not is_collab
+        lb = from_remote(remote_url, username, owner, labbook_name, labbook=lb,
+                         make_owner=make_owner)
         return ImportRemoteLabbook(active_branch=lb.active_branch)
 
 
