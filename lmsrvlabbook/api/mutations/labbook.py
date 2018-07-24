@@ -385,6 +385,7 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
         #       so we change to owner to the given user so they can (re)publish
         #       and do whatever with it.
         make_owner = not is_collab
+        logger.info(f"Getting from remote, make_owner = {make_owner}")
         lb = from_remote(remote_url, username, owner, labbook_name, labbook=lb,
                          make_owner=make_owner)
         return ImportRemoteLabbook(active_branch=lb.active_branch)
