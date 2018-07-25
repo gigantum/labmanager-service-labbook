@@ -21,11 +21,10 @@ import graphene
 from lmsrvlabbook.api.mutations import (CreateBranch, CheckoutBranch, CreateLabbook, BuildImage, StartContainer,
                                         AddCustomComponent, AddPackageComponents, CreateUserNote, StopContainer,
                                         ImportLabbook, DeleteLabbook,
-                                        ImportRemoteLabbook, AddLabbookRemote, PullActiveBranchFromRemote,
-                                        PushActiveBranchToRemote,
+                                        ImportRemoteLabbook, AddLabbookRemote,
                                         ExportLabbook, AddLabbookFile, MoveLabbookFile, DeleteLabbookFile,
                                         MakeLabbookDirectory, RemoveUserIdentity,
-                                        AddLabbookFavorite, RemoveLabbookFavorite, RenameLabbook, UpdateLabbookFavorite,
+                                        AddLabbookFavorite, RemoveLabbookFavorite, UpdateLabbookFavorite,
                                         AddLabbookCollaborator,
                                         DeleteLabbookCollaborator, SyncLabbook, PublishLabbook, RemoveCustomComponent,
                                         RemovePackageComponents,
@@ -57,9 +56,6 @@ class LabbookMutations(graphene.ObjectType):
     # Delete a labbook from a remote server
     delete_remote_labbook = DeleteRemoteLabbook.Field()
 
-    # Rename new labbook
-    rename_labbook = RenameLabbook.Field()
-
     # (Re-)set labbook description
     set_labbook_description = SetLabbookDescription.Field()
 
@@ -74,12 +70,6 @@ class LabbookMutations(graphene.ObjectType):
 
     # Update a given labbook to be at the tip of a particular git branch.
     checkout_branch = CheckoutBranch.Field()
-
-    #
-    pull_active_branch_from_remote = PullActiveBranchFromRemote.Field()
-
-    #
-    push_active_branch_to_remote = PushActiveBranchToRemote.Field()
 
     # Add a remote to the labbook
     add_labbook_remote = AddLabbookRemote.Field()

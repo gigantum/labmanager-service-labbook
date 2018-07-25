@@ -2,11 +2,10 @@ from lmsrvlabbook.api.mutations.ref import CreateBranch, CheckoutBranch
 from lmsrvlabbook.api.mutations.labbook import (CreateLabbook, DeleteLabbook, DeleteRemoteLabbook,
                                                 SetLabbookDescription, ExportLabbook, ImportLabbook,
                                                 ImportRemoteLabbook,
-                                                MakeLabbookDirectory, AddLabbookRemote, PullActiveBranchFromRemote,
-                                                PushActiveBranchToRemote,
+                                                MakeLabbookDirectory, AddLabbookRemote,
                                                 AddLabbookFile, MoveLabbookFile, DeleteLabbookFile,
                                                 AddLabbookFavorite, RemoveLabbookFavorite, UpdateLabbookFavorite,
-                                                RenameLabbook, AddLabbookCollaborator, DeleteLabbookCollaborator,
+                                                AddLabbookCollaborator, DeleteLabbookCollaborator,
                                                 WriteReadme, CompleteBatchUploadTransaction)
 from lmsrvlabbook.api.mutations.environment import (BuildImage, StartContainer, StopContainer)
 from lmsrvlabbook.api.mutations.container import StartDevTool
