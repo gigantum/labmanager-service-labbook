@@ -92,7 +92,8 @@ class TestLabbookSharing(object):
         """
         r = fixture_working_dir[2].execute(query, context_value=req)
         pprint.pprint(r)
-        assert r['data']['importRemoteLabbook']['owner'] == 'gm.workspace-default'
+        assert r['data']['importRemoteLabbook']['node']['owner'] == 'default'
+        assert r['data']['importRemoteLabbook']['node']['name'] == 'sample-repo-lb'
         assert 'errors' not in r
 
         ## Now we want to validate that when we import a labbook from a remote url, we also track the default branch.
@@ -177,7 +178,8 @@ class TestLabbookSharing(object):
         pprint.pprint(r)
         assert 'errors' not in r
         # We might not always want to use master as the default branch, but keep it here for now.
-        assert r['data']['importRemoteLabbook']['activeBranch'] == 'gm.workspace-default'
+        assert r['data']['importRemoteLabbook']['node']['owner'] == 'default'
+        assert r['data']['importRemoteLabbook']['node']['name'] == 'default-owned-repo-lb'
 
         ## Now we want to validate that when we import a labbook from a remote url, we also track the default branch.
         list_all_branches_q = f"""
