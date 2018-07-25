@@ -81,11 +81,17 @@ class TestLabbookSharing(object):
               labbookName: "sample-repo-lb",
               remoteUrl: "{remote_labbook_repo}"
             }}) {{
-              activeBranch
+                
+                edge {{
+                    node {{
+                        activeBranch
+                    }}
+                }}
             }}
         }}
         """
         r = fixture_working_dir[2].execute(query, context_value=req)
+        pprint.pprint(r)
         assert r['data']['importRemoteLabbook']['activeBranch'] == 'gm.workspace-default'
         assert 'errors' not in r
 
@@ -136,6 +142,7 @@ class TestLabbookSharing(object):
         assert r['data']['labbook']['defaultRemote'] == remote_labbook_repo
         assert 'errors' not in r
 
+
     def test_import_remote_labbook_from_same_user(self, remote_labbook_repo, fixture_working_dir):
         # Create a labbook by the "default" user
         # TODO: enable LFS when integration tests support it
@@ -163,6 +170,8 @@ class TestLabbookSharing(object):
         }}
         """
         r = fixture_working_dir[2].execute(query, context_value=req)
+        pprint.pprint(r)
+        assert 'errors' not in r
         # We might not always want to use master as the default branch, but keep it here for now.
         assert r['data']['importRemoteLabbook']['activeBranch'] == 'gm.workspace-default'
 
