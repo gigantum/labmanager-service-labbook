@@ -81,10 +81,10 @@ class TestLabbookSharing(object):
               labbookName: "sample-repo-lb",
               remoteUrl: "{remote_labbook_repo}"
             }}) {{
-                
-                edge {{
+                newLabbookEdge {{
                     node {{
-                        activeBranch
+                        owner
+                        name
                     }}
                 }}
             }}
@@ -92,7 +92,7 @@ class TestLabbookSharing(object):
         """
         r = fixture_working_dir[2].execute(query, context_value=req)
         pprint.pprint(r)
-        assert r['data']['importRemoteLabbook']['activeBranch'] == 'gm.workspace-default'
+        assert r['data']['importRemoteLabbook']['owner'] == 'gm.workspace-default'
         assert 'errors' not in r
 
         ## Now we want to validate that when we import a labbook from a remote url, we also track the default branch.
@@ -142,7 +142,6 @@ class TestLabbookSharing(object):
         assert r['data']['labbook']['defaultRemote'] == remote_labbook_repo
         assert 'errors' not in r
 
-
     def test_import_remote_labbook_from_same_user(self, remote_labbook_repo, fixture_working_dir):
         # Create a labbook by the "default" user
         # TODO: enable LFS when integration tests support it
@@ -165,7 +164,12 @@ class TestLabbookSharing(object):
               labbookName: "default-owned-repo-lb",
               remoteUrl: "{labbook_dir}"
             }}) {{
-              activeBranch
+                newLabbookEdge {{
+                    node {{
+                        owner
+                        name
+                    }}
+                }}
             }}
         }}
         """
