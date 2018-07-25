@@ -338,7 +338,7 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
 
         # TODO: Fix cursor implementation, this currently doesn't make sense
         cursor = base64.b64encode(f"{0}".encode('utf-8'))
-        lbedge = LabbookConnection.Edge(node=Labbook(owner=owner, name=labbook_name),
+        lbedge = LabbookConnection.Edge(node=Labbook(owner=lb.owner['username'], name=labbook_name),
                                         cursor=cursor)
         return ImportRemoteLabbook(new_labbook_edge=lbedge)
 
