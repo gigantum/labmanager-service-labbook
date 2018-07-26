@@ -135,20 +135,6 @@ RUN pip3 install Pillow==4.2.1
     }
 }
 
-snapshots['TestEnvironmentServiceQueries.test_package_query_no_version 1'] = {
-    'data': {
-        'package': {
-            'fromBase': False,
-            'id': 'UGFja2FnZUNvbXBvbmVudDpwaXAmcmVxdWVzdHMmMi4xOC40',
-            'latestVersion': '2.18.4',
-            'manager': 'pip',
-            'package': 'requests',
-            'schema': None,
-            'version': '2.18.4'
-        }
-    }
-}
-
 snapshots['TestEnvironmentServiceQueries.test_get_package_manager 1'] = {
     'data': {
         'labbook': {

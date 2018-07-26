@@ -95,7 +95,11 @@ snapshots['TestLabBookRemoteOperations.test_list_remote_labbooks_invalid_args 1'
                     'line': 4
                 }
             ],
-            'message': 'Unsupported order_by: asdf. Use `name`, `created_on`, `modified_on`'
+            'message': 'Unsupported order_by: asdf. Use `name`, `created_on`, `modified_on`',
+            'path': [
+                'labbookList',
+                'remoteLabbooks'
+            ]
         }
     ]
 }
@@ -114,7 +118,11 @@ snapshots['TestLabBookRemoteOperations.test_list_remote_labbooks_invalid_args 2'
                     'line': 4
                 }
             ],
-            'message': 'Unsupported sort_str: asdf. Use `desc`, `asc`'
+            'message': 'Unsupported sort_str: asdf. Use `desc`, `asc`',
+            'path': [
+                'labbookList',
+                'remoteLabbooks'
+            ]
         }
     ]
 }

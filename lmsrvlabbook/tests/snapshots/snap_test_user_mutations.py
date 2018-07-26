@@ -35,7 +35,12 @@ snapshots['TestUserIdentityMutations.test_remove_user_identity 2'] = {
                     'line': 5
                 }
             ],
-            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)"
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)",
+            'path': [
+                'removeUserIdentity',
+                'userIdentityEdge',
+                'username'
+            ]
         }
     ]
 }
