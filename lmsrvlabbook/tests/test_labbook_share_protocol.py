@@ -30,7 +30,7 @@ from werkzeug.wrappers import Request
 
 from lmcommon.fixtures import (remote_labbook_repo, remote_bare_repo, mock_labbook,
                                mock_config_file, _MOCK_create_remote_repo2)
-from lmcommon.labbook import LabBook, from_remote
+from lmcommon.labbook import LabBook, loaders
 from lmcommon.workflows import GitWorkflow
 from lmcommon.files import FileOperations
 
@@ -116,7 +116,7 @@ class TestLabbookShareProtocol(object):
         assert remote_url
 
         sally_lb = LabBook(mock_config_file[0])
-        from_remote(remote_url, username="sally", owner="default", labbook_name="labbook1", labbook=sally_lb)
+        loaders.from_remote(remote_url, username="sally", owner="default", labbook_name="labbook1", labbook=sally_lb)
         sally_wf = GitWorkflow(sally_lb)
         assert sally_lb.active_branch == "gm.workspace-sally"
         sally_lb.makedir(relative_path='code/sally-dir', create_activity_record=True)

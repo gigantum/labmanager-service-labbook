@@ -27,7 +27,7 @@ import graphene
 from lmcommon.configuration import Configuration, get_docker_client
 from lmcommon.container.container import ContainerOperations
 from lmcommon.dispatcher import (Dispatcher, jobs)
-from lmcommon.labbook import LabBook, from_remote
+from lmcommon.labbook import LabBook, loaders
 from lmcommon.logging import LMLogger
 from lmcommon.files import FileOperations
 from lmcommon.imagebuilder import ImageBuilder
@@ -336,8 +336,8 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
         #       and do whatever with it.
         make_owner = not is_collab
         logger.info(f"Getting from remote, make_owner = {make_owner}")
-        lb = from_remote(remote_url, username, owner, labbook_name, labbook=lb,
-                         make_owner=make_owner)
+        lb = loaders.from_remote(remote_url, username, owner, labbook_name, labbook=lb,
+                                 make_owner=make_owner)
 
         # TODO: Fix cursor implementation, this currently doesn't make sense
         cursor = base64.b64encode(f"{0}".encode('utf-8'))
