@@ -31,7 +31,63 @@ snapshots['TestUserIdentityQueries.test_no_logged_in_user 1'] = {
                     'line': 4
                 }
             ],
-            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)"
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)",
+            'path': [
+                'userIdentity',
+                'id'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 5
+                }
+            ],
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)",
+            'path': [
+                'userIdentity',
+                'username'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 6
+                }
+            ],
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)",
+            'path': [
+                'userIdentity',
+                'email'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 7
+                }
+            ],
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)",
+            'path': [
+                'userIdentity',
+                'givenName'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 8
+                }
+            ],
+            'message': "({'code': 'missing_token', 'description': 'JWT must be provided if no locally stored identity is available'}, 401)",
+            'path': [
+                'userIdentity',
+                'familyName'
+            ]
         }
     ]
 }
@@ -56,7 +112,63 @@ snapshots['TestUserIdentityQueries.test_invalid_token 1'] = {
                     'line': 4
                 }
             ],
-            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)"
+            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)",
+            'path': [
+                'userIdentity',
+                'id'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 5
+                }
+            ],
+            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)",
+            'path': [
+                'userIdentity',
+                'username'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 6
+                }
+            ],
+            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)",
+            'path': [
+                'userIdentity',
+                'email'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 7
+                }
+            ],
+            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)",
+            'path': [
+                'userIdentity',
+                'givenName'
+            ]
+        },
+        {
+            'locations': [
+                {
+                    'column': 35,
+                    'line': 8
+                }
+            ],
+            'message': "({'code': 'invalid_header', 'description': 'Unable to parse authentication token.'}, 400)",
+            'path': [
+                'userIdentity',
+                'familyName'
+            ]
         }
     ]
 }

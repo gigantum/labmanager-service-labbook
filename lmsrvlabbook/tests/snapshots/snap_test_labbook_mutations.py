@@ -105,23 +105,6 @@ snapshots['TestLabBookServiceMutations.test_move_file_many 6'] = {
     }
 }
 
-snapshots['TestLabBookServiceMutations.test_add_file_errors 1'] = {
-    'data': {
-        'addLabbookFile': None
-    },
-    'errors': [
-        {
-            'locations': [
-                {
-                    'column': 23,
-                    'line': 3
-                }
-            ],
-            'message': 'No file "uploadChunk" associated with request'
-        }
-    ]
-}
-
 snapshots['TestLabBookServiceMutations.test_add_favorite 1'] = {
     'data': {
         'labbook': {
@@ -411,7 +394,10 @@ snapshots['TestLabBookServiceMutations.test_create_labbook_already_exists 3'] = 
                     'line': 4
                 }
             ],
-            'message': 'LabBook `test-lab-duplicate` already exists locally. Choose a new LabBook name'
+            'message': 'LabBook `test-lab-duplicate` already exists locally. Choose a new LabBook name',
+            'path': [
+                'createLabbook'
+            ]
         }
     ]
 }
