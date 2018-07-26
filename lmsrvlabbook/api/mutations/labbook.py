@@ -328,7 +328,7 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
             collaborators = [collab[1] for collab in mgr.get_collaborators(owner, labbook_name) or []]
             is_collab = any([username == c for c in collaborators])
         except:
-            is_collab = False
+            is_collab = username == owner
 
         # IF user is collaborator, then clone in order to support collaboration
         # ELSE, this means we are cloning a public repo and can't push back
