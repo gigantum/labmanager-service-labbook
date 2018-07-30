@@ -74,7 +74,11 @@ snapshots['TestNodeQueries.test_favorites_node 1'] = {
                     'line': 7
                 }
             ],
-            'message': "'test333.txt'"
+            'message': "'test333.txt'",
+            'path': [
+                'node',
+                'description'
+            ]
         },
         {
             'locations': [
@@ -83,7 +87,11 @@ snapshots['TestNodeQueries.test_favorites_node 1'] = {
                     'line': 8
                 }
             ],
-            'message': "'test333.txt'"
+            'message': "'test333.txt'",
+            'path': [
+                'node',
+                'isDir'
+            ]
         },
         {
             'locations': [
@@ -92,7 +100,11 @@ snapshots['TestNodeQueries.test_favorites_node 1'] = {
                     'line': 9
                 }
             ],
-            'message': "'test333.txt'"
+            'message': "'test333.txt'",
+            'path': [
+                'node',
+                'index'
+            ]
         }
     ]
 }

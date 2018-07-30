@@ -870,36 +870,6 @@ class TestLabBookServiceMutations(object):
                 chunk.close()
 
 
-    def test_rename_labbook(self, fixture_working_dir):
-        """Test renaming a labbook"""
-        # Create a dummy labbook to make sure directory structure is set up
-        lb_dummy = LabBook(fixture_working_dir[0])
-        lb_dummy.new(owner={"username": "default"}, name="dummy-lb", description="Tester dummy lb")
-
-        # Unzip test labbook into working directory
-        test_zip_file = os.path.join(resource_filename('lmsrvlabbook', 'tests'), 'data', 'test-labbook.zip')
-        labbooks_dir = os.path.join(fixture_working_dir[1], 'default', 'default', 'labbooks')
-        with ZipFile(test_zip_file) as zf:
-            zf.extractall(labbooks_dir)
-
-        original_dir = os.path.join(labbooks_dir, 'test-labbook')
-        new_dir = os.path.join(labbooks_dir, 'test-new-name')
-
-        # rename (without the container being previously built)
-        query = f"""
-                    mutation myMutation{{
-                      renameLabbook(input:{{owner:"default",
-                      originalLabbookName: "test-labbook",
-                      newLabbookName: "test-new-name"}}) {{
-                        success
-                      }}
-                    }}
-                    """
-        r = fixture_working_dir[2].execute(query)
-        assert r['data']['renameLabbook'] is None
-        assert 'errors' in r
-        assert 'NotImplemented' in r['errors'][0]['message']
-
     def test_write_readme(self, mock_create_labbooks, snapshot):
         content = json.dumps('##Overview\n\nThis is my readme\n :df,a//3p49kasdf')
 

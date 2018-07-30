@@ -152,7 +152,7 @@ class TestContainerMutations(object):
                     devTool: "jupyterlab"
                 }}) {{
                     path
-                    }}
+                }}
 
             }}
             """
@@ -160,8 +160,9 @@ class TestContainerMutations(object):
             assert 'errors' not in r
 
             assert ':10000/jupyter/' in r['data']['startDevTool']['path']
-            l = [a for a in docker_client.containers.get(container_id=container_id).exec_run(
-                'sh -c "ps aux | grep jupyter-lab | grep -v \' grep \'"', user='giguser').decode().split('\n') if a]
+            rc, t = docker_client.containers.get(container_id=container_id).exec_run(
+                'sh -c "ps aux | grep jupyter-lab | grep -v \' grep \'"', user='giguser')
+            l = [a for a in t.decode().split('\n') if a]
             assert len(l) == 1
         finally:
             # Remove the container you fired up

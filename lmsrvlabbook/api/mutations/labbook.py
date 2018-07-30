@@ -27,7 +27,7 @@ import graphene
 from lmcommon.configuration import Configuration, get_docker_client
 from lmcommon.container.container import ContainerOperations
 from lmcommon.dispatcher import (Dispatcher, jobs)
-from lmcommon.labbook import LabBook
+from lmcommon.labbook import LabBook, loaders
 from lmcommon.logging import LMLogger
 from lmcommon.files import FileOperations
 from lmcommon.imagebuilder import ImageBuilder
@@ -41,6 +41,7 @@ from lmsrvcore.auth.identity import parse_token
 
 from lmsrvlabbook.api.connections.labbookfileconnection import LabbookFavoriteConnection
 from lmsrvlabbook.api.connections.labbookfileconnection import LabbookFileConnection
+from lmsrvlabbook.api.connections.labbook import LabbookConnection
 from lmsrvlabbook.api.objects.labbook import Labbook
 from lmsrvlabbook.api.objects.labbookfile import LabbookFavorite, LabbookFile
 from lmsrvlabbook.dataloader.labbook import LabBookLoader
@@ -209,58 +210,6 @@ class DeleteRemoteLabbook(graphene.ClientIDMutation):
             return DeleteLabbook(success=False)
 
 
-class RenameLabbook(graphene.ClientIDMutation):
-    """Rename a labbook"""
-    class Input:
-        owner = graphene.String(required=True)
-        original_labbook_name = graphene.String(required=True)
-        new_labbook_name = graphene.String(required=True)
-
-    success = graphene.Boolean()
-
-    @classmethod
-    def mutate_and_get_payload(cls, root, info, owner, original_labbook_name, new_labbook_name,
-                               client_mutation_id=None):
-        # This bypasses the original implementation. Rename is temporarily disabled.
-        raise NotImplemented('Rename functionality is temporarily disabled.')
-
-    @classmethod
-    def prior_mutate_and_get_payload(cls, root, info, owner, original_labbook_name, new_labbook_name,
-                                     client_mutation_id=None):
-        # NOTE!!! This is the code that was originally to rename.
-        # Temporarily, rename functionality is disabled.
-        # Load LabBook
-        username = get_logged_in_username()
-
-        working_directory = Configuration().config['git']['working_directory']
-        inferred_lb_directory = os.path.join(working_directory, username, owner, 'labbooks',
-                                             original_labbook_name)
-        lb = LabBook(author=get_logged_in_author())
-        lb.from_directory(inferred_lb_directory)
-
-        # Image names
-        old_tag = '{}-{}-{}'.format(username, owner, original_labbook_name)
-        new_tag = '{}-{}-{}'.format(username, owner, new_labbook_name)
-
-        # Rename LabBook
-        lb.rename(new_labbook_name)
-        logger.info(f"Renamed LabBook from `{original_labbook_name}` to `{new_labbook_name}`")
-
-        # Build image with new name...should be fast and use the Docker cache
-        client = get_docker_client()
-        image_builder = ImageBuilder(lb.root_dir)
-        image_builder.build_image(docker_client=client, image_tag=new_tag, username=username, background=True)
-
-        # Delete old image if it had previously been built successfully
-        try:
-            client.images.get(old_tag)
-            client.images.remove(old_tag)
-        except ImageNotFound:
-            logger.warning(f"During renaming, original image {old_tag} not found, removal skipped.")
-
-        return RenameLabbook(success=True)
-
-
 class ExportLabbook(graphene.relay.ClientIDMutation):
     class Input:
         owner = graphene.String(required=True)
@@ -353,15 +302,13 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
         labbook_name = graphene.String(required=True)
         remote_url = graphene.String(required=True)
 
-    active_branch = graphene.String()
+    new_labbook_edge = graphene.Field(LabbookConnection.Edge)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, owner, labbook_name, remote_url, client_mutation_id=None):
         username = get_logged_in_username()
         logger.info(f"Importing remote labbook from {remote_url}")
         lb = LabBook(author=get_logged_in_author())
-
-        # TODO: Future work will look up remote in LabBook data, allowing user to select remote.
         default_remote = lb.labmanager_config.config['git']['default_remote']
         admin_service = None
         for remote in lb.labmanager_config.config['git']['remotes']:
@@ -377,9 +324,26 @@ class ImportRemoteLabbook(graphene.relay.ClientIDMutation):
 
         mgr = GitLabManager(default_remote, admin_service, token)
         mgr.configure_git_credentials(default_remote, username)
+        try:
+            collaborators = [collab[1] for collab in mgr.get_collaborators(owner, labbook_name) or []]
+            is_collab = any([username == c for c in collaborators])
+        except:
+            is_collab = username == owner
 
-        lb.from_remote(remote_url, username, owner, labbook_name)
-        return ImportRemoteLabbook(active_branch=lb.active_branch)
+        # IF user is collaborator, then clone in order to support collaboration
+        # ELSE, this means we are cloning a public repo and can't push back
+        #       so we change to owner to the given user so they can (re)publish
+        #       and do whatever with it.
+        make_owner = not is_collab
+        logger.info(f"Getting from remote, make_owner = {make_owner}")
+        lb = loaders.from_remote(remote_url, username, owner, labbook_name, labbook=lb,
+                                 make_owner=make_owner)
+
+        # TODO: Fix cursor implementation, this currently doesn't make sense
+        cursor = base64.b64encode(f"{0}".encode('utf-8'))
+        lbedge = LabbookConnection.Edge(node=Labbook(owner=lb.owner['username'], name=labbook_name),
+                                        cursor=cursor)
+        return ImportRemoteLabbook(new_labbook_edge=lbedge)
 
 
 class AddLabbookRemote(graphene.relay.ClientIDMutation):
@@ -401,50 +365,6 @@ class AddLabbookRemote(graphene.relay.ClientIDMutation):
         lb.from_name(username, owner, labbook_name)
         lb.add_remote(remote_name, remote_url)
         return AddLabbookRemote(success=True)
-
-
-class PullActiveBranchFromRemote(graphene.relay.ClientIDMutation):
-    class Input:
-        owner = graphene.String(required=True)
-        labbook_name = graphene.String(required=True)
-        remote_name = graphene.String(required=False)
-
-    success = graphene.Boolean()
-
-    @classmethod
-    def mutate_and_get_payload(cls, root, info, owner, labbook_name, remote_name, client_mutation_id=None):
-        username = get_logged_in_username()
-        logger.info(f"Importing remote labbook from {remote_name}")
-        lb = LabBook(author=get_logged_in_author())
-        lb.from_name(username, owner, labbook_name)
-        remote = remote_name
-        if remote:
-            lb.pull(remote=remote)
-        else:
-            lb.pull()
-        return PullActiveBranchFromRemote(success=True)
-
-
-class PushActiveBranchToRemote(graphene.relay.ClientIDMutation):
-    class Input:
-        owner = graphene.String(required=True)
-        labbook_name = graphene.String(required=True)
-        remote_name = graphene.String(required=False)
-
-    success = graphene.Boolean()
-
-    @classmethod
-    def mutate_and_get_payload(cls, root, info, owner, labbook_name, remote_name, client_mutation_id=None):
-        username = get_logged_in_username()
-        logger.info(f"Importing remote labbook from {remote_name}")
-        lb = LabBook(author=get_logged_in_author())
-        lb.from_name(username, owner, labbook_name)
-        remote = remote_name
-        if remote:
-            lb.push(remote=remote)
-        else:
-            lb.push()
-        return PushActiveBranchToRemote(success=True)
 
 
 class SetLabbookDescription(graphene.relay.ClientIDMutation):

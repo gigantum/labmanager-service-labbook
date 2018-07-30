@@ -92,22 +92,34 @@ def ping():
 @app.route(f'{api_prefix}/savehook/<username>/<owner>/<labbook_name>')
 def savehook(username, owner, labbook_name):
     try:
-        redis_conn = redis.Redis(db=1)
-        lb_key = '-'.join(['gmlb', username, owner, labbook_name, 'jupyter-token'])
         changed_file = request.args.get('file')
         jupyter_token = request.args.get('jupyter_token')
-        logger.info(f"Received save hook for {changed_file} in {username}/{owner}/{labbook_name}")
-        r = redis_conn.get(lb_key.encode())
+        logger.debug(f"Received save hook for {changed_file} in {username}/{owner}/{labbook_name}")
+
+        redis_conn = redis.Redis(db=1)
+        lb_jupyter_token_key = '-'.join(['gmlb', username, owner, labbook_name, 'jupyter-token'])
+        lb_active_key = f"{'|'.join([username, owner, labbook_name])}&is-busy*"
+
+        r = redis_conn.get(lb_jupyter_token_key.encode())
         if r is None:
-            logger.error(f"Could not find redis key `{lb_key}`")
+            logger.error(f"Could not find jupyter token for {username}/{owner}/{labbook_name}")
             abort(400)
+
         if r.decode() != jupyter_token:
-            raise ValueError("Incoming jupyter token must match key in Redis")
+            raise ValueError("Incoming jupyter token must be valid")
+
+        if len(redis_conn.keys(lb_active_key.encode())) > 0:
+            # A kernel in this project is still active. Don't save auto-commit because it can blow up the
+            # repository size depending on what the user is doing
+            logger.info(f"Skipping jupyter savehook for {username}/{owner}/{labbook_name} due to active kernel")
+            return 'success'
+
         lb = LabBook(author=get_logged_in_author())
         lb.from_name(username, owner, labbook_name)
-        logger.info(f"Jupyter save hook saving {changed_file} from {str(lb)}")
         with lb.lock_labbook():
             lb.sweep_uncommitted_changes()
+
+        logger.info(f"Jupyter save hook saved {changed_file} from {str(lb)}")
         return 'success'
     except Exception as err:
         logger.error(err)
