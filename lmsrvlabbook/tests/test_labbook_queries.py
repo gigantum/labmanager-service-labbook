@@ -86,7 +86,7 @@ class TestLabBookServiceQueries(object):
         query = """
                 {
                 labbookList{
-                    localLabbooks(orderBy: "name", sort: "asc") {
+                    localLabbooks(orderBy: "name", sort: "desc") {
                         edges {
                             node {
                                 id

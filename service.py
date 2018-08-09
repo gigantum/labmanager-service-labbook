@@ -134,8 +134,11 @@ def cleanup_git(response):
     loader = getattr(flask.request, 'labbook_loader', None)
     if loader:
         for key in loader.__dict__["_promise_cache"]:
-            lb = loader.__dict__["_promise_cache"][key].value
-            lb.git.repo.__del__()
+            try:
+                lb = loader.__dict__["_promise_cache"][key].value
+                lb.git.repo.__del__()
+            except AttributeError:
+                continue
     return response
 # TEMPORARY KLUDGE
 

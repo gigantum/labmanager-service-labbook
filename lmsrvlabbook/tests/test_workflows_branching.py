@@ -379,7 +379,7 @@ class TestWorkflowsBranching(object):
         assert og_hash != branch_hash
 
         bm.workon_branch(bm.workspace_branch)
-        assert lb.git.log()[1]['commit'] == og_hash  # There is 1 extra commit due to sweep
+        assert lb.git.log()[0]['commit'] == og_hash 
         assert not os.path.exists(os.path.join(lb.root_dir, 'code/sillydir1'))
 
         merge_q = f"""
@@ -415,7 +415,7 @@ class TestWorkflowsBranching(object):
         bm.workon_branch(bm.workspace_branch)
         assert lb.active_branch == bm.workspace_branch
         og2_hash = lb.git.commit_hash
-        #assert lb.git.commit_hash == og_hash      <---- I don't understand why this isn't the case...
+        assert lb.git.commit_hash == og_hash
 
         lb.makedir('code/main-branch-dir1', create_activity_record=True)
         lb.makedir('code/main-branch-dir2', create_activity_record=True)
