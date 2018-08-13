@@ -142,15 +142,19 @@ def cleanup_git(response):
 
 logger.info("Cloning/Updating environment repositories.")
 
-erm = RepositoryManager()
-update_successful = erm.update_repositories()
-if update_successful:
-    logger.info("Indexing environment repositories.")
-    erm.index_repositories()
-    logger.info("Environment repositories updated and ready.")
+try:
+    erm = RepositoryManager()
+    update_successful = erm.update_repositories()
+    if update_successful:
+        logger.info("Indexing environment repositories.")
+        erm.index_repositories()
+        logger.info("Environment repositories updated and ready.")
 
-else:
-    logger.info("Unable to update environment repositories at startup, most likely due to lack of internet access.")
+    else:
+        logger.info("Unable to update environment repositories at startup, most likely due to lack of internet access.")
+except Exception as e:
+    logger.error(e)
+    raise
 
 # Empty container-container share dir as it is ephemeral
 share_dir = os.path.join(os.path.sep, 'mnt', 'share')
