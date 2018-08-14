@@ -128,7 +128,7 @@ class TestUploadFilesMutations(object):
         r = client.execute(complete_query, context_value=DummyContext(file))
         assert 'errors' not in r
         assert lb.is_repo_clean
-        assert 'Uploaded new file' in lb.git.log()[0]['message']
+        assert 'Uploaded 1 new file(s)' in lb.git.log()[0]['message']
 
     def test_add_file_fail_due_to_git_ignore(self, mock_create_labbooks):
         """Test adding a new file to a labbook"""
