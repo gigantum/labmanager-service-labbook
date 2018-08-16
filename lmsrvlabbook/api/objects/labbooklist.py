@@ -49,12 +49,12 @@ class LabbookList(graphene.ObjectType, interfaces=(graphene.relay.Node,)):
     # Connection to locally available labbooks
     local_labbooks = graphene.relay.ConnectionField(LabbookConnection,
                                                     order_by=graphene.String(default_value="name"),
-                                                    sort=graphene.String(default_value="desc"))
+                                                    sort=graphene.String(default_value="asc"))
 
     # Connection to remotely available labbooks
     remote_labbooks = graphene.relay.ConnectionField(RemoteLabbookConnection,
                                                      order_by=graphene.String(default_value="name"),
-                                                     sort=graphene.String(default_value="desc"))
+                                                     sort=graphene.String(default_value="asc"))
 
     @classmethod
     def get_node(cls, info, id):
@@ -97,9 +97,9 @@ class LabbookList(graphene.ObjectType, interfaces=(graphene.relay.Node,)):
         username = get_logged_in_username()
 
         if sort == "desc":
-            reverse = False
-        elif sort == "asc":
             reverse = True
+        elif sort == "asc":
+            reverse = False
         else:
             raise ValueError(f"Unsupported sort_str: {sort_str}. Use `desc`, `asc`")
 
