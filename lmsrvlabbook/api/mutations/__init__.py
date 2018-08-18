@@ -6,8 +6,7 @@ from lmsrvlabbook.api.mutations.labbook import (CreateLabbook, DeleteLabbook, De
                                                 AddLabbookFavorite, RemoveLabbookFavorite, UpdateLabbookFavorite,
                                                 AddLabbookCollaborator, DeleteLabbookCollaborator,
                                                 WriteReadme, CompleteBatchUploadTransaction)
-from lmsrvlabbook.api.mutations.environment import (BuildImage, StartContainer, StopContainer)
-from lmsrvlabbook.api.mutations.container import StartDevTool
+from lmsrvlabbook.api.mutations.container import (StartDevTool, BuildImage, StartContainer, StopContainer)
 from lmsrvlabbook.api.mutations.note import CreateUserNote
 from lmsrvlabbook.api.mutations.branching import (CreateExperimentalBranch, DeleteExperimentalBranch,
                                                   MergeFromBranch, WorkonBranch)
