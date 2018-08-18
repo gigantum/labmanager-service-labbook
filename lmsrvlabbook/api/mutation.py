@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import graphene
-from lmsrvlabbook.api.mutations import (CreateBranch, CheckoutBranch, CreateLabbook, BuildImage, StartContainer,
+from lmsrvlabbook.api.mutations import (CreateLabbook, BuildImage, StartContainer,
                                         AddCustomComponent, AddPackageComponents, CreateUserNote, StopContainer,
                                         ImportLabbook, DeleteLabbook,
                                         ImportRemoteLabbook, AddLabbookRemote,
@@ -64,12 +64,6 @@ class LabbookMutations(graphene.ObjectType):
 
     # Sync a Labbook with remote (for collaboration)
     sync_labbook = SyncLabbook.Field()
-
-    # Create a new git branch for a given labbook.
-    create_branch = CreateBranch.Field()
-
-    # Update a given labbook to be at the tip of a particular git branch.
-    checkout_branch = CheckoutBranch.Field()
 
     # Add a remote to the labbook
     add_labbook_remote = AddLabbookRemote.Field()
