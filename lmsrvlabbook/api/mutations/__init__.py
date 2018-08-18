@@ -1,11 +1,12 @@
 from lmsrvlabbook.api.mutations.labbook import (CreateLabbook, DeleteLabbook, DeleteRemoteLabbook,
-                                                SetLabbookDescription, ExportLabbook, ImportLabbook,
-                                                ImportRemoteLabbook,
-                                                MakeLabbookDirectory, AddLabbookRemote,
-                                                AddLabbookFile, MoveLabbookFile, DeleteLabbookFile,
-                                                AddLabbookFavorite, RemoveLabbookFavorite, UpdateLabbookFavorite,
-                                                AddLabbookCollaborator, DeleteLabbookCollaborator,
-                                                WriteReadme, CompleteBatchUploadTransaction)
+                                                ExportLabbook, ImportLabbook,
+                                                ImportRemoteLabbook)
+
+from lmsrvlabbook.api.mutations.operations import (SetLabbookDescription, MakeLabbookDirectory, AddLabbookRemote,
+                                                   AddLabbookFile, MoveLabbookFile, DeleteLabbookFile,
+                                                   AddLabbookFavorite, RemoveLabbookFavorite, UpdateLabbookFavorite,
+                                                   AddLabbookCollaborator, DeleteLabbookCollaborator,
+                                                   WriteReadme, CompleteBatchUploadTransaction)
 from lmsrvlabbook.api.mutations.container import (StartDevTool, BuildImage, StartContainer, StopContainer)
 from lmsrvlabbook.api.mutations.note import CreateUserNote
 from lmsrvlabbook.api.mutations.branching import (CreateExperimentalBranch, DeleteExperimentalBranch,
