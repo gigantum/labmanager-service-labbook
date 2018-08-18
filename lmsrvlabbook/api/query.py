@@ -33,9 +33,7 @@ from lmsrvcore.api.connections import ListBasedConnection
 
 from lmsrvlabbook.api.objects.labbook import Labbook
 from lmsrvlabbook.api.objects.labbooklist import LabbookList
-from lmsrvlabbook.api.objects.basecomponent import BaseComponent
-from lmsrvlabbook.api.objects.customcomponent import CustomComponent
-from lmsrvlabbook.api.objects.packagecomponent import PackageComponent
+from lmsrvlabbook.api.objects.envcomponents import BaseComponent, CustomComponent, PackageComponent
 from lmsrvlabbook.api.objects.jobstatus import JobStatus
 from lmsrvlabbook.api.connections.environment import BaseComponentConnection, CustomComponentConnection
 from lmsrvlabbook.api.connections.jobstatus import JobStatusConnection
