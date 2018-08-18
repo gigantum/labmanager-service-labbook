@@ -43,7 +43,7 @@ from lmsrvlabbook.api.objects.ref import LabbookRef
 from lmsrvlabbook.api.objects.labbooksection import LabbookSection
 from lmsrvlabbook.api.connections.activity import ActivityConnection
 from lmsrvlabbook.api.objects.activity import ActivityDetailObject, ActivityRecordObject
-from lmsrvlabbook.api.objects.packagecomponent import PackageComponent, PackageComponentInput
+from lmsrvlabbook.api.objects.envcomponents import PackageComponent, PackageComponentInput
 
 logger = LMLogger.get_logger()
 
