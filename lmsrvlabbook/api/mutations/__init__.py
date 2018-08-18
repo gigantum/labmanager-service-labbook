@@ -10,8 +10,8 @@ from lmsrvlabbook.api.mutations.container import (StartDevTool, BuildImage, Star
 from lmsrvlabbook.api.mutations.note import CreateUserNote
 from lmsrvlabbook.api.mutations.branching import (CreateExperimentalBranch, DeleteExperimentalBranch,
                                                   MergeFromBranch, WorkonBranch)
-from lmsrvlabbook.api.mutations.environmentcomponent import (AddCustomComponent, AddPackageComponents,
-                                                             RemoveCustomComponent, RemovePackageComponents,
-                                                             AddCustomDocker, RemoveCustomDocker)
+from lmsrvlabbook.api.mutations.environment import (AddCustomComponent, AddPackageComponents,
+                                                    RemoveCustomComponent, RemovePackageComponents,
+                                                    AddCustomDocker, RemoveCustomDocker)
 from lmsrvlabbook.api.mutations.user import RemoveUserIdentity
-from lmsrvlabbook.api.mutations.labbooksharing import SyncLabbook, PublishLabbook
+from lmsrvlabbook.api.mutations.publishing import SyncLabbook, PublishLabbook
