@@ -19,11 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import graphene
+import requests
 import base64
 
-import docker
 from docker.errors import ImageNotFound, NotFound
-import requests
 
 from lmcommon.dispatcher import Dispatcher
 from lmcommon.environment.componentmanager import ComponentManager
@@ -36,9 +35,7 @@ from lmsrvcore.auth.user import get_logged_in_username
 from lmsrvcore.api.connections import ListBasedConnection
 
 from lmsrvlabbook.api.connections.environment import CustomComponentConnection, PackageComponentConnection
-from lmsrvlabbook.api.objects.basecomponent import BaseComponent
-from lmsrvlabbook.api.objects.packagecomponent import PackageComponent
-from lmsrvlabbook.api.objects.customcomponent import CustomComponent
+from lmsrvlabbook.api.objects.envcomponents import BaseComponent, PackageComponent, CustomComponent
 from lmsrvlabbook.dataloader.package import PackageLatestVersionLoader
 
 logger = LMLogger.get_logger()
