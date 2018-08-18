@@ -25,10 +25,8 @@ from lmcommon.logging import LMLogger
 from lmcommon.configuration import Configuration
 from lmcommon.dispatcher import Dispatcher
 from lmcommon.environment import ComponentRepository
-from lmcommon.environment.utils import get_package_manager
 from lmcommon.labbook.schemas import CURRENT_SCHEMA
 
-from lmsrvcore.auth.user import get_logged_in_username
 from lmsrvcore.api.connections import ListBasedConnection
 
 from lmsrvlabbook.api.objects.labbook import Labbook

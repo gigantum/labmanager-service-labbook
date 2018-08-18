@@ -18,9 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import graphene
-from lmsrvlabbook.api.objects.basecomponent import BaseComponent
-from lmsrvlabbook.api.objects.packagecomponent import PackageComponent
-from lmsrvlabbook.api.objects.customcomponent import CustomComponent
+from lmsrvlabbook.api.objects.envcomponents import BaseComponent, PackageComponent, CustomComponent
 
 
 class BaseComponentConnection(graphene.relay.Connection):
