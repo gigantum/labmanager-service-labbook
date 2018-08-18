@@ -28,7 +28,7 @@ from lmcommon.environment import ComponentManager
 from lmcommon.labbook.schemas import CURRENT_SCHEMA
 from lmsrvcore.auth.user import get_logged_in_username, get_logged_in_author
 from lmsrvlabbook.api.objects.envcomponents import PackageComponent, PackageComponentInput, CustomComponent
-from lmsrvlabbook.api.objects.environment import Environment
+from lmsrvlabbook.api.objects.container import Environment
 from lmsrvlabbook.api.connections.environment import CustomComponentConnection, PackageComponentConnection
 
 logger = LMLogger.get_logger()

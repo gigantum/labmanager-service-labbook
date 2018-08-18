@@ -34,7 +34,7 @@ from lmcommon.workflows import GitWorkflow
 from lmcommon.logging import LMLogger
 from lmcommon.activity.services import stop_labbook_monitor
 
-from lmsrvlabbook.api.objects.environment import Environment
+from lmsrvlabbook.api.objects.container import Environment
 from lmsrvcore.auth.user import get_logged_in_username, get_logged_in_author
 
 logger = LMLogger.get_logger()

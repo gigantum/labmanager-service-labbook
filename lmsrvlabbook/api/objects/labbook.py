@@ -37,7 +37,7 @@ from lmsrvcore.auth.identity import parse_token
 
 from lmsrvlabbook.api.objects.jobstatus import JobStatus
 from lmsrvlabbook.api.connections.ref import LabbookRefConnection
-from lmsrvlabbook.api.objects.environment import Environment
+from lmsrvlabbook.api.objects.container import Environment
 from lmsrvlabbook.api.objects.overview import LabbookOverview
 from lmsrvlabbook.api.objects.ref import LabbookRef
 from lmsrvlabbook.api.objects.labbooksection import LabbookSection
