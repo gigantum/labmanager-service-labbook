@@ -18,14 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import pytest
-from lmsrvlabbook.tests.fixtures import fixture_working_dir, build_image_for_jupyterlab
 import getpass
 from promise import Promise
 
+from lmsrvlabbook.tests.fixtures import fixture_working_dir, build_image_for_jupyterlab
 from lmsrvlabbook.dataloader.package import PackageLatestVersionLoader
-from lmsrvlabbook.api.objects.packagecomponent import PackageComponent
-from lmcommon.configuration import get_docker_client
-from lmcommon.labbook import LabBook
 
 
 class TestDataloaderPackage(object):
