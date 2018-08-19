@@ -515,8 +515,7 @@ class DeleteLabbookFile(graphene.ClientIDMutation):
                                              labbook_name)
         lb = LabBook(author=get_logged_in_author())
         lb.from_directory(inferred_lb_directory)
-        lb.delete_file(section=section, relative_path=file_path,
-                       directory=is_directory)
+        FileOperations.delete_file(lb, section=section, relative_path=file_path)
 
         return DeleteLabbookFile(success=True)
 
@@ -543,7 +542,7 @@ class MoveLabbookFile(graphene.ClientIDMutation):
                                              labbook_name)
         lb = LabBook(author=get_logged_in_author())
         lb.from_directory(inferred_lb_directory)
-        file_info = lb.move_file(section, src_path, dst_path)
+        file_info = FileOperations.move_file(lb, section, src_path, dst_path)
         logger.info(f"Moved file to `{dst_path}`")
 
         # Prime dataloader with labbook you already loaded
@@ -583,7 +582,7 @@ class MakeLabbookDirectory(graphene.ClientIDMutation):
                                              labbook_name)
         lb = LabBook(author=get_logged_in_author())
         lb.from_directory(inferred_lb_directory)
-        lb.makedir(os.path.join(section, directory), create_activity_record=True)
+        FileOperations.makedir(lb, os.path.join(section, directory), create_activity_record=True)
         logger.info(f"Made new directory in `{directory}`")
 
         # Prime dataloader with labbook you already loaded

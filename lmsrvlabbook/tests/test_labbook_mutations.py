@@ -41,6 +41,7 @@ from werkzeug.datastructures import FileStorage
 
 from lmcommon.configuration import Configuration
 from lmcommon.dispatcher.jobs import export_labbook_as_zip
+from lmcommon.files import FileOperations
 from lmcommon.fixtures import remote_labbook_repo, mock_config_file
 from lmcommon.labbook import LabBook
 
@@ -420,7 +421,7 @@ class TestLabBookServiceMutations(object):
 
         lb = LabBook(mock_create_labbooks[0])
         lb.from_name('default', 'default', 'labbook1')
-        lb.makedir('code/subdir')
+        FileOperations.makedir(lb, 'code/subdir')
         lb.git.add_all('code/')
         lb.git.commit("blah")
 

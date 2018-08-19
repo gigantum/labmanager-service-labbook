@@ -372,8 +372,8 @@ class TestWorkflowsBranching(object):
         bm = BranchManager(lb, username=UT_USERNAME)
         og_hash = lb.git.commit_hash
         b1 = bm.create_branch("test-branch")
-        lb.makedir('code/sillydir1', create_activity_record=True)
-        lb.makedir('code/sillydir2', create_activity_record=True)
+        FileOperations.makedir(lb, 'code/sillydir1', create_activity_record=True)
+        FileOperations.makedir(lb, 'code/sillydir2', create_activity_record=True)
         branch_hash = lb.git.commit_hash
 
         assert og_hash != branch_hash
@@ -417,8 +417,8 @@ class TestWorkflowsBranching(object):
         og2_hash = lb.git.commit_hash
         assert lb.git.commit_hash == og_hash
 
-        lb.makedir('code/main-branch-dir1', create_activity_record=True)
-        lb.makedir('code/main-branch-dir2', create_activity_record=True)
+        FileOperations.makedir(lb, 'code/main-branch-dir1', create_activity_record=True)
+        FileOperations.makedir(lb, 'code/main-branch-dir2', create_activity_record=True)
         next_main_hash = lb.git.commit_hash
         assert og_hash != next_main_hash
 
@@ -535,7 +535,7 @@ class TestWorkflowsBranching(object):
 
         nb = bm.create_branch('new-branch')
         assert os.path.exists(os.path.join(lb.root_dir, 'code', 's1.txt'))
-        lb.delete_file('code', 's1.txt')
+        FileOperations.delete_file(lb, 'code', 's1.txt')
         assert lb.is_repo_clean
         assert not os.path.exists(os.path.join(lb.root_dir, 'code', 's1.txt'))
 
