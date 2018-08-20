@@ -53,6 +53,8 @@ class LabbookQuery(graphene.ObjectType):
     # Node Fields for Relay
     node = graphene.relay.Node.Field()
 
+    cuda_version = graphene.String()
+
     build_info = graphene.String()
 
     labbook = graphene.Field(Labbook, owner=graphene.String(), name=graphene.String())
@@ -94,10 +96,16 @@ class LabbookQuery(graphene.ObjectType):
 
     def resolve_build_info(self, info):
         """Return this LabManager build info (hash, build timestamp, etc)"""
+        # TODO - CUDA version should possibly go in here
         build_info = Configuration().config.get('build_info') or {}
         return '-'.join([build_info.get('application', 'UnknownDate'),
                          build_info.get('revision', 'UnknownHash'),
-                         build_info.get('built_on', 'UnknownApplication')])
+                         build_info.get('built_on', 'UnknownApplication'),
+                         ])
+
+    def resolve_cuda_version(self, info):
+        """Return the CUDA version of the host machine. Non-null implies GPU available"""
+        return Configuration().host_cuda_version
 
     def resolve_labbook(self, info, owner: str, name: str):
         """Method to return a graphene Labbok instance based on the name
