@@ -100,8 +100,7 @@ class LabbookQuery(graphene.ObjectType):
         build_info = Configuration().config.get('build_info') or {}
         return '-'.join([build_info.get('application', 'UnknownDate'),
                          build_info.get('revision', 'UnknownHash'),
-                         build_info.get('built_on', 'UnknownApplication'),
-                         ])
+                         build_info.get('built_on', 'UnknownApplication')])
 
     def resolve_cuda_version(self, info):
         """Return the CUDA version of the host machine. Non-null implies GPU available"""
