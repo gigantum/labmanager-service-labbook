@@ -577,8 +577,11 @@ class Labbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepositor
 
         # Get collaborators from remote service
         mgr = GitLabManager(default_remote, admin_service, token)
-        d = mgr.repo_details(namespace=labbook.owner['username'], labbook_name=labbook.name)
-        return d.get('visibility')
+        try:
+            d = mgr.repo_details(namespace=labbook.owner['username'], labbook_name=labbook.name)
+            return d.get('visibility')
+        except ValueError:
+            return "local"
 
     def resolve_public_visibility(self, info):
         """ Return string indicating visibility of project from GitLab:
