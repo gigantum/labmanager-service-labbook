@@ -48,14 +48,19 @@ logger = LMLogger.get_logger()
 
 class LabbookQuery(graphene.ObjectType):
     """Entry point for all LabBook queryable fields"""
+
+    # TODO - Put all these fields in alphabetical order?
+
     # Create instance of the LabBook dataloader for use across all objects within this query instance
 
     # Node Fields for Relay
     node = graphene.relay.Node.Field()
 
-    cuda_version = graphene.String()
-
+    # Return app build date and hash
     build_info = graphene.String()
+
+    # Return whether this has CUDA installed and can run GPU-enabled projects
+    cuda_available = graphene.Boolean()
 
     labbook = graphene.Field(Labbook, owner=graphene.String(), name=graphene.String())
 
@@ -102,9 +107,12 @@ class LabbookQuery(graphene.ObjectType):
                          build_info.get('revision', 'UnknownHash'),
                          build_info.get('built_on', 'UnknownApplication')])
 
-    def resolve_cuda_version(self, info):
+    def resolve_cuda_available(self, info):
         """Return the CUDA version of the host machine. Non-null implies GPU available"""
-        return Configuration().host_cuda_version
+        if Configuration().host_cuda_version:
+            return False
+        else:
+            return True
 
     def resolve_labbook(self, info, owner: str, name: str):
         """Method to return a graphene Labbok instance based on the name
