@@ -39,12 +39,14 @@ class PublishLabbook(graphene.relay.ClientIDMutation):
     class Input:
         owner = graphene.String(required=True)
         labbook_name = graphene.String(required=True)
+        set_public = graphene.Boolean(required=False)
 
     success = graphene.Boolean()
 
     @classmethod
     @logged_mutation
-    def mutate_and_get_payload(cls, root, info, owner, labbook_name, client_mutation_id=None):
+    def mutate_and_get_payload(cls, root, info, owner, labbook_name, set_public=False,
+                               client_mutation_id=None):
         # Load LabBook
         username = get_logged_in_username()
         working_directory = Configuration().config['git']['working_directory']
@@ -61,7 +63,7 @@ class PublishLabbook(graphene.relay.ClientIDMutation):
         # BVB -- Should this defer to `sync` if Labbook's remote is already set?
         # Otherwise, it will throw an exception, which may still be ok.
         wf = GitWorkflow(labbook=lb)
-        wf.publish(username=username, access_token=token)
+        wf.publish(username=username, access_token=token, public=set_public)
 
         return PublishLabbook(success=True)
 
