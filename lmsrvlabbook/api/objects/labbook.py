@@ -134,7 +134,7 @@ class Labbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepositor
     # Package Query for validating packages and getting PackageComponents by attributes
     packages = graphene.List(PackageComponent, package_input=graphene.List(PackageComponentInput))
 
-    public_visibility = graphene.String()
+    visibility = graphene.String()
 
     @classmethod
     def get_node(cls, info, id):
@@ -560,7 +560,7 @@ class Labbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepositor
             lambda labbook: self.helper_resolve_packages(labbook, package_input))
 
     @staticmethod
-    def helper_resolve_public_visibility(labbook, info):
+    def helper_resolve_visibility(labbook, info):
         # TODO: Future work will look up remote in LabBook data, allowing user to select remote.
         default_remote = labbook.labmanager_config.config['git']['default_remote']
         admin_service = None
@@ -583,9 +583,9 @@ class Labbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepositor
         except ValueError:
             return "local"
 
-    def resolve_public_visibility(self, info):
+    def resolve_visibility(self, info):
         """ Return string indicating visibility of project from GitLab:
          "public", "private", or "internal". """
 
         return info.context.labbook_loader.load(f"{get_logged_in_username()}&{self.owner}&{self.name}").then(
-            lambda labbook: self.helper_resolve_public_visibility(labbook, info))
+            lambda labbook: self.helper_resolve_visibility(labbook, info))

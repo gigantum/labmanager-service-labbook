@@ -43,7 +43,7 @@ class RemoteLabbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRep
     description = graphene.String()
 
     # Whether it is public or private (or local only)
-    public_visibility = graphene.String()
+    visibility = graphene.String()
 
     # Creation date/timestamp in UTC in ISO format
     creation_date_utc = graphene.String()
@@ -70,7 +70,7 @@ class RemoteLabbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRep
             self.id = f"{self.owner}&{self.name}"
         return self.id
 
-    def resolve_public_visibility(self, info):
+    def resolve_visibility(self, info):
         app_config = Configuration().config
         default_remote = app_config['git']['default_remote']
         admin_service = None
