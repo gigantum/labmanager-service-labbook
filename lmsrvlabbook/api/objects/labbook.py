@@ -134,6 +134,8 @@ class Labbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepositor
     # Package Query for validating packages and getting PackageComponents by attributes
     packages = graphene.List(PackageComponent, package_input=graphene.List(PackageComponentInput))
 
+    visibility = graphene.String()
+
     @classmethod
     def get_node(cls, info, id):
         """Method to resolve the object based on it's Node ID"""
@@ -556,3 +558,34 @@ class Labbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepositor
         """
         return info.context.labbook_loader.load(f"{get_logged_in_username()}&{self.owner}&{self.name}").then(
             lambda labbook: self.helper_resolve_packages(labbook, package_input))
+
+    @staticmethod
+    def helper_resolve_visibility(labbook, info):
+        # TODO: Future work will look up remote in LabBook data, allowing user to select remote.
+        default_remote = labbook.labmanager_config.config['git']['default_remote']
+        admin_service = None
+        for remote in labbook.labmanager_config.config['git']['remotes']:
+            if default_remote == remote:
+                admin_service = labbook.labmanager_config.config['git']['remotes'][remote]['admin_service']
+                break
+
+        # Extract valid Bearer token
+        if "HTTP_AUTHORIZATION" in info.context.headers.environ:
+            token = parse_token(info.context.headers.environ["HTTP_AUTHORIZATION"])
+        else:
+            raise ValueError("Authorization header not provided. Must have a valid session to query for collaborators")
+
+        # Get collaborators from remote service
+        mgr = GitLabManager(default_remote, admin_service, token)
+        try:
+            d = mgr.repo_details(namespace=labbook.owner['username'], labbook_name=labbook.name)
+            return d.get('visibility')
+        except ValueError:
+            return "local"
+
+    def resolve_visibility(self, info):
+        """ Return string indicating visibility of project from GitLab:
+         "public", "private", or "internal". """
+
+        return info.context.labbook_loader.load(f"{get_logged_in_username()}&{self.owner}&{self.name}").then(
+            lambda labbook: self.helper_resolve_visibility(labbook, info))

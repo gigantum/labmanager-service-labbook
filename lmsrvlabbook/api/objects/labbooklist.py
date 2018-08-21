@@ -193,7 +193,8 @@ class LabbookList(graphene.ObjectType, interfaces=(graphene.relay.Node,)):
                            "owner": edge["namespace"],
                            "description": edge["description"],
                            "creation_date_utc": edge["created_on"],
-                           "modified_date_utc": edge["modified_on"]}
+                           "modified_date_utc": edge["modified_on"],
+                           "visibility": edge.get("visibility")}
 
             edge_objs.append(RemoteLabbookConnection.Edge(node=RemoteLabbook(**create_data),
                                                           cursor=cursor))
