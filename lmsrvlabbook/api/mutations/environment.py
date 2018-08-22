@@ -73,8 +73,8 @@ class AddPackageComponents(graphene.relay.ClientIDMutation):
         for cnt, pkg in enumerate(packages):
             pc = PackageComponent(manager=manager, package=pkg["package"],
                                   version=pkg["version"], schema=CURRENT_SCHEMA)
-            cursor = base64.b64encode(str(cursor+cnt).encode()).decode()
-            new_edges.append(PackageComponentConnection.Edge(node=pc, cursor=cursor))
+            cr = base64.b64encode(str(cursor+cnt).encode()).decode()
+            new_edges.append(PackageComponentConnection.Edge(node=pc, cursor=cr))
 
         return AddPackageComponents(new_package_component_edges=new_edges)
 
