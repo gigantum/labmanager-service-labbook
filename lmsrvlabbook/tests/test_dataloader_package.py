@@ -52,7 +52,7 @@ class TestDataloaderPackage(object):
         assert len(version_list) == 3
         assert version_list[0] == "2.10.6"
         assert version_list[1] == "0.11"
-        assert version_list[2] == "1.15.0"
+        assert version_list[2] == "1.15.1"
 
     @pytest.mark.skipif(getpass.getuser() == 'circleci', reason="Conda not available on CircleCI")
     def test_load_many_conda(self, build_image_for_jupyterlab):
@@ -68,7 +68,7 @@ class TestDataloaderPackage(object):
 
         assert version_list[0] == "4.0.10"
         assert version_list[1] == "1.1.0"
-        assert version_list[2] == "1.15.0"
+        assert version_list[2] == "1.15.1"
 
     @pytest.mark.skipif(getpass.getuser() == 'circleci', reason="Conda not available on CircleCI")
     def test_load_many_conda2(self, build_image_for_jupyterlab):
@@ -83,7 +83,7 @@ class TestDataloaderPackage(object):
         assert len(version_list) == 3
         assert version_list[0] == "4.0.10"
         assert version_list[1] == "1.1.0"
-        assert version_list[2] == "1.15.0"
+        assert version_list[2] == "1.15.1"
 
     @pytest.mark.skipif(getpass.getuser() == 'circleci', reason="Conda not available on CircleCI")
     def test_load_many_mixed(self, build_image_for_jupyterlab):
@@ -98,7 +98,7 @@ class TestDataloaderPackage(object):
         assert len(version_list) == 3
         assert version_list[0] == "4.0.10"
         assert version_list[1] == "1.1.0"
-        assert version_list[2] == "1.15.0"
+        assert version_list[2] == "1.15.1"
 
     @pytest.mark.skipif(getpass.getuser() == 'circleci', reason="Conda not available on CircleCI")
     def test_load_invalid_package(self, build_image_for_jupyterlab):

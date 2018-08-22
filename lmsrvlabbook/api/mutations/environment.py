@@ -71,11 +71,10 @@ class AddPackageComponents(graphene.relay.ClientIDMutation):
 
         new_edges = list()
         for cnt, pkg in enumerate(packages):
-            new_edges.append(PackageComponentConnection.Edge(node=PackageComponent(manager=manager,
-                                                                                   package=pkg["package"],
-                                                                                   version=pkg["version"],
-                                                                                   schema=CURRENT_SCHEMA),
-                             cursor=base64.b64encode(str(cursor+cnt).encode()).decode()))
+            pc = PackageComponent(manager=manager, package=pkg["package"],
+                                  version=pkg["version"], schema=CURRENT_SCHEMA)
+            cursor = base64.b64encode(str(cursor+cnt).encode()).decode()
+            new_edges.append(PackageComponentConnection.Edge(node=pc, cursor=cursor))
 
         return AddPackageComponents(new_package_component_edges=new_edges)
 
@@ -95,12 +94,8 @@ class RemovePackageComponents(graphene.relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, owner, labbook_name, manager, packages,
                                client_mutation_id=None):
         username = get_logged_in_username()
-
-        # Load LabBook instance
         lb = LabBook(author=get_logged_in_author())
         lb.from_name(username, owner, labbook_name)
-
-        # Create Component Manager
         cm = ComponentManager(lb)
         cm.remove_packages(package_manager=manager, package_names=packages)
 
@@ -170,9 +165,9 @@ class AddCustomComponent(graphene.relay.ClientIDMutation):
         cm.add_component("custom", repository, component_id, revision, force=True)
 
         # TODO: get cursor by checking how many packages are already installed
-
-        new_edge = CustomComponentConnection.Edge(node=CustomComponent(repository=repository, component_id=component_id,
-                                                                       revision=revision),
+        cc = CustomComponent(repository=repository, component_id=component_id,
+                             revision=revision)
+        new_edge = CustomComponentConnection.Edge(node=cc,
                                                   cursor=0)
 
         return AddCustomComponent(new_custom_component_edge=new_edge)
@@ -193,11 +188,8 @@ class RemoveCustomComponent(graphene.relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, owner, labbook_name, repository, component_id, client_mutation_id=None):
         username = get_logged_in_username()
 
-        # Load LabBook instance
         lb = LabBook(author=get_logged_in_author())
         lb.from_name(username, owner, labbook_name)
-
-        # Create Component Manager
         cm = ComponentManager(lb)
         cm.remove_component("custom", repository, component_id)
 

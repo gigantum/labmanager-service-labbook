@@ -119,7 +119,7 @@ class TestLabbookShareProtocol(object):
         loaders.from_remote(remote_url, username="sally", owner="default", labbook_name="labbook1", labbook=sally_lb)
         sally_wf = GitWorkflow(sally_lb)
         assert sally_lb.active_branch == "gm.workspace-sally"
-        sally_lb.makedir(relative_path='code/sally-dir', create_activity_record=True)
+        FileOperations.makedir(sally_lb, relative_path='code/sally-dir', create_activity_record=True)
         sally_wf.sync('sally')
 
         sync_query = """
