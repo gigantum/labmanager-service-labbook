@@ -413,6 +413,8 @@ class TestLabBookServiceMutations(object):
         assert os.path.exists(filepath) is True
 
         res = mock_create_labbooks[2].execute(query)
+        pprint.pprint(res)
+        assert 'errors' not in res
         assert res['data']['deleteLabbookFile']['success'] is True
 
         assert os.path.exists(filepath) is False
