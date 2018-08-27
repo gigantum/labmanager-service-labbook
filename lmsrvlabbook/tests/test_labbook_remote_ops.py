@@ -132,6 +132,11 @@ class TestLabBookRemoteOperations(object):
                                 "message": "404 Project Not Found"
                             }],
                       status=404)
+        responses.add(responses.DELETE, 'https://api.gigantum.com/read/index/default%2Fnew-labbook',
+                      json=[{
+                                "message": "success"
+                            }],
+                      status=204)
 
         delete_query = f"""
         mutation delete {{
