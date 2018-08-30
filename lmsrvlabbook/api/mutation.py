@@ -157,4 +157,4 @@ class LabbookMutations(graphene.ObjectType):
     workon_experimental_branch = WorkonBranch.Field()
 
     # Set a remote project visibiltiy
-    set_visibilty = SetVisibility.Field()
+    set_visibility = SetVisibility.Field()
