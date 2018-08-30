@@ -127,6 +127,8 @@ class SetVisibility(graphene.relay.ClientIDMutation):
         labbook_name = graphene.String(required=True)
         visibility = graphene.String(required=True)
 
+    success = graphene.Boolean()
+
     @classmethod
     @logged_mutation
     def mutate_and_get_payload(cls, root, info, owner, labbook_name, visibility,
@@ -163,3 +165,5 @@ class SetVisibility(graphene.relay.ClientIDMutation):
         mgr.configure_git_credentials(default_remote, username)
 
         mgr.set_visibility(namespace=owner, labbook_name=labbook_name, visibility=visibility)
+
+        return SetVisibility(success=True)
