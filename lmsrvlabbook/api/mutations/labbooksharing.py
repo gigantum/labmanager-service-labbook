@@ -119,3 +119,47 @@ class SyncLabbook(graphene.relay.ClientIDMutation):
         # Create an updated graphne Labbook instance to return for convenience of Relay.
         updatedl = LabbookObject(owner=owner, name=labbook_name)
         return SyncLabbook(update_count=cnt, updated_labbook=updatedl)
+
+
+class SetVisibility(graphene.relay.ClientIDMutation):
+    class Input:
+        owner = graphene.String(required=True)
+        labbook_name = graphene.String(required=True)
+        visibility = graphene.String(required=True)
+
+    @classmethod
+    @logged_mutation
+    def mutate_and_get_payload(cls, root, info, owner, labbook_name, visibility,
+                               client_mutation_id=None):
+        # Load LabBook
+        username = get_logged_in_username()
+        working_directory = Configuration().config['git']['working_directory']
+        inferred_lb_directory = os.path.join(working_directory, username, owner, 'labbooks',
+                                             labbook_name)
+        lb = LabBook(author=get_logged_in_author())
+        lb.from_directory(inferred_lb_directory)
+
+        # Extract valid Bearer token
+        token = None
+        if hasattr(info.context.headers, 'environ'):
+            if "HTTP_AUTHORIZATION" in info.context.headers.environ:
+                token = parse_token(info.context.headers.environ["HTTP_AUTHORIZATION"])
+
+        if not token:
+            raise ValueError("Authorization header not provided. Must have a valid session to query for collaborators")
+
+        default_remote = lb.labmanager_config.config['git']['default_remote']
+        admin_service = None
+        for remote in lb.labmanager_config.config['git']['remotes']:
+            if default_remote == remote:
+                admin_service = lb.labmanager_config.config['git']['remotes'][remote]['admin_service']
+                break
+
+        if not admin_service:
+            raise ValueError('admin_service could not be found')
+
+        # Configure git creds
+        mgr = GitLabManager(default_remote, admin_service, access_token=token)
+        mgr.configure_git_credentials(default_remote, username)
+
+        mgr.set_visibility(namespace=owner, labbook_name=labbook_name, visibility=visibility)
