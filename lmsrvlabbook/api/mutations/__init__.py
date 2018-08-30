@@ -16,4 +16,4 @@ from lmsrvlabbook.api.mutations.environmentcomponent import (AddCustomComponent,
                                                              RemoveCustomComponent, RemovePackageComponents,
                                                              AddCustomDocker, RemoveCustomDocker)
 from lmsrvlabbook.api.mutations.user import RemoveUserIdentity
-from lmsrvlabbook.api.mutations.labbooksharing import SyncLabbook, PublishLabbook
+from lmsrvlabbook.api.mutations.labbooksharing import SyncLabbook, PublishLabbook, SetVisibility
