@@ -22,6 +22,7 @@ import graphene
 
 from lmcommon.configuration import Configuration
 from lmcommon.labbook import LabBook
+from lmcommon.dispatcher import Dispatcher, jobs
 from lmcommon.logging import LMLogger
 from lmcommon.gitlib.gitlab import GitLabManager
 from lmcommon.workflows import GitWorkflow
@@ -41,7 +42,7 @@ class PublishLabbook(graphene.relay.ClientIDMutation):
         labbook_name = graphene.String(required=True)
         set_public = graphene.Boolean(required=False)
 
-    success = graphene.Boolean()
+    job_key = graphene.String()
 
     @classmethod
     @logged_mutation
@@ -60,12 +61,17 @@ class PublishLabbook(graphene.relay.ClientIDMutation):
         else:
             raise ValueError("Authorization header not provided. Must have a valid session to query for collaborators")
 
-        # BVB -- Should this defer to `sync` if Labbook's remote is already set?
-        # Otherwise, it will throw an exception, which may still be ok.
-        wf = GitWorkflow(labbook=lb)
-        wf.publish(username=username, access_token=token, public=set_public)
+        job_metadata = {'method': 'publish_labbook',
+                        'labbook': lb.key}
+        job_kwargs = {'labbook_path': lb.root_dir,
+                      'username': username,
+                      'access_token': token,
+                      'public': set_public}
+        dispatcher = Dispatcher()
+        job_key = dispatcher.dispatch_task(jobs.publish_labbook, kwargs=job_kwargs, metadata=job_metadata)
+        logger.info(f"Publishing LabBook {lb.root_dir} in background job with key {job_key.key_str}")
 
-        return PublishLabbook(success=True)
+        return PublishLabbook(job_key=job_key.key_str)
 
 
 class SyncLabbook(graphene.relay.ClientIDMutation):
@@ -75,9 +81,7 @@ class SyncLabbook(graphene.relay.ClientIDMutation):
         labbook_name = graphene.String(required=True)
         force = graphene.Boolean(required=False)
 
-    # How many upstream commits it pulled in.
-    update_count = graphene.Int()
-    updated_labbook = graphene.Field(LabbookObject)
+    job_key = graphene.String()
 
     @classmethod
     @logged_mutation
@@ -113,9 +117,13 @@ class SyncLabbook(graphene.relay.ClientIDMutation):
         mgr = GitLabManager(default_remote, admin_service, access_token=token)
         mgr.configure_git_credentials(default_remote, username)
 
-        wf = GitWorkflow(labbook=lb)
-        cnt = wf.sync(username=username, force=force)
+        job_metadata = {'method': 'sync_labbook',
+                        'labbook': lb.key}
+        job_kwargs = {'labbook_path': lb.root_dir,
+                      'username': username,
+                      'force': force}
+        dispatcher = Dispatcher()
+        job_key = dispatcher.dispatch_task(jobs.sync_labbook(), kwargs=job_kwargs, metadata=job_metadata)
+        logger.info(f"Syncing LabBook {lb.root_dir} in background job with key {job_key.key_str}")
 
-        # Create an updated graphne Labbook instance to return for convenience of Relay.
-        updatedl = LabbookObject(owner=owner, name=labbook_name)
-        return SyncLabbook(update_count=cnt, updated_labbook=updatedl)
+        return SyncLabbook(job_key=job_key.key_str)
