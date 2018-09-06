@@ -123,7 +123,7 @@ class SyncLabbook(graphene.relay.ClientIDMutation):
                       'username': username,
                       'force': force}
         dispatcher = Dispatcher()
-        job_key = dispatcher.dispatch_task(jobs.sync_labbook(), kwargs=job_kwargs, metadata=job_metadata)
+        job_key = dispatcher.dispatch_task(jobs.sync_labbook, kwargs=job_kwargs, metadata=job_metadata)
         logger.info(f"Syncing LabBook {lb.root_dir} in background job with key {job_key.key_str}")
 
         return SyncLabbook(job_key=job_key.key_str)
