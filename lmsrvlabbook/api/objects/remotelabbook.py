@@ -18,9 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import graphene
-from lmsrvcore.api.interfaces import GitRepository
+
+from lmcommon.configuration import Configuration
+from lmcommon.gitlib.gitlab import GitLabManager
 from lmcommon.labbook import LabBook
+
+from lmsrvcore.api.interfaces import GitRepository
 from lmsrvcore.auth.user import get_logged_in_username
+from lmsrvcore.auth.identity import parse_token
 
 
 class RemoteLabbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRepository)):
@@ -36,6 +41,9 @@ class RemoteLabbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRep
     """
     # A short description of the LabBook limited to 140 UTF-8 characters
     description = graphene.String()
+
+    # Whether it is public or private (or local only)
+    visibility = graphene.String()
 
     # Creation date/timestamp in UTC in ISO format
     creation_date_utc = graphene.String()
@@ -61,6 +69,29 @@ class RemoteLabbook(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRep
                 raise ValueError("Resolving a Remote Labbook Node ID requires owner and name to be set")
             self.id = f"{self.owner}&{self.name}"
         return self.id
+
+    def resolve_visibility(self, info):
+        app_config = Configuration().config
+        default_remote = app_config['git']['default_remote']
+        admin_service = None
+        for remote in Configuration().config['git']['remotes']:
+            if default_remote == remote:
+                admin_service = app_config['git']['remotes'][remote]['admin_service']
+                break
+
+        # Extract valid Bearer token
+        if "HTTP_AUTHORIZATION" in info.context.headers.environ:
+            token = parse_token(info.context.headers.environ["HTTP_AUTHORIZATION"])
+        else:
+            raise ValueError("Authorization header not provided. Must have a valid session to query for collaborators")
+
+        # Get collaborators from remote service
+        mgr = GitLabManager(default_remote, admin_service, token)
+        try:
+            d = mgr.repo_details(namespace=self.owner, labbook_name=self.name)
+            return d.get('visibility')
+        except ValueError:
+            return "unknown"
 
     def resolve_description(self, info):
         """Return the description of the labbook"""

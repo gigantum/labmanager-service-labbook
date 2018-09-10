@@ -64,7 +64,7 @@ class TestUploadFilesMutations(object):
                                    'labbook1', 'code', 'newdir', "myValidFile.dat")
         lb = LabBook(mock_create_labbooks[0])
         lb.from_directory(os.path.join(mock_create_labbooks[1], 'default', 'default', 'labbooks', 'labbook1'))
-        lb.makedir('code/newdir', create_activity_record=True)
+        FileOperations.makedir(lb, 'code/newdir', create_activity_record=True)
 
         txid = "000-unitest-transaction"
         with open(test_file, 'rb') as tf:
@@ -128,7 +128,7 @@ class TestUploadFilesMutations(object):
         r = client.execute(complete_query, context_value=DummyContext(file))
         assert 'errors' not in r
         assert lb.is_repo_clean
-        assert 'Uploaded new file' in lb.git.log()[0]['message']
+        assert 'Uploaded 1 new file(s)' in lb.git.log()[0]['message']
 
     def test_add_file_fail_due_to_git_ignore(self, mock_create_labbooks):
         """Test adding a new file to a labbook"""
@@ -160,7 +160,7 @@ class TestUploadFilesMutations(object):
             pass
         lb = LabBook(mock_create_labbooks[0])
         lb.from_directory(os.path.join(mock_create_labbooks[1], 'default', 'default', 'labbooks', 'labbook1'))
-        lb.makedir('code/newdir', create_activity_record=True)
+        FileOperations.makedir(lb, 'code/newdir', create_activity_record=True)
 
         with open(test_file, 'rb') as tf:
             # Check for file to exist (shouldn't yet)

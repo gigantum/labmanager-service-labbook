@@ -81,7 +81,7 @@ class LabbookSection(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRe
                 base_dir = base_dir.replace(os.path.sep + os.path.sep, os.path.sep)
 
         # Get all files and directories, with the exception of anything in .git or .gigantum
-        edges = labbook.listdir(self.section, base_path=base_dir, show_hidden=False)
+        edges = FileOperations.listdir(labbook, self.section, base_path=base_dir, show_hidden=False)
 
         # Generate naive cursors
         cursors = [base64.b64encode("{}".format(cnt).encode("UTF-8")).decode("UTF-8") for cnt, x in enumerate(edges)]
@@ -118,7 +118,7 @@ class LabbookSection(graphene.ObjectType, interfaces=(graphene.relay.Node, GitRe
         else:
             # Load from disk and cache
             # Get all files and directories, with the exception of anything in .git or .gigantum
-            edges = labbook.walkdir(section=self.section, show_hidden=False)
+            edges = FileOperations.walkdir(labbook, section=self.section, show_hidden=False)
             redis_conn.set(cache_key, json.dumps(edges))
             redis_conn.expire(cache_key, 5)
 

@@ -22,7 +22,9 @@ import os
 from docker.errors import ImageNotFound
 import shutil
 
+import flask
 import graphene
+import requests
 
 from lmcommon.configuration import Configuration, get_docker_client
 from lmcommon.container.container import ContainerOperations
@@ -185,6 +187,7 @@ class DeleteRemoteLabbook(graphene.ClientIDMutation):
             for remote in configuration['git']['remotes']:
                 if default_remote == remote:
                     admin_service = configuration['git']['remotes'][remote]['admin_service']
+                    index_service = configuration['git']['remotes'][remote]['index_service']
                     break
 
             if not admin_service:
@@ -204,7 +207,25 @@ class DeleteRemoteLabbook(graphene.ClientIDMutation):
             except ValueError as e:
                 logger.warning(e)
 
-            return DeleteLabbook(success=True)
+            # Call Index service to remove project from cloud index and search
+            # Don't raise an exception if the index delete fails, since this can be handled relatively gracefully
+            # for now, but do return success=false
+            success = True
+            access_token = flask.g.get('access_token', None)
+            id_token = flask.g.get('id_token', None)
+            repo_id = mgr.get_repository_id(owner, labbook_name)
+            response = requests.delete(f"https://{index_service}/{repo_id}",
+                                       headers={"Authorization": f"Bearer {access_token}",
+                                                "Identity": id_token}, timeout=10)
+
+            if response.status_code != 204:
+                logger.error(f"Failed to remove project from cloud index. Status Code: {response.status_code}")
+                logger.error(response.json())
+                success = False
+            else:
+                logger.info(f"Deleted remote repository {owner}/{labbook_name} from cloud index")
+
+            return DeleteLabbook(success=success)
         else:
             logger.info(f"Dry run deleting {labbook_name} from remote repository -- not deleted.")
             return DeleteLabbook(success=False)
@@ -515,8 +536,7 @@ class DeleteLabbookFile(graphene.ClientIDMutation):
                                              labbook_name)
         lb = LabBook(author=get_logged_in_author())
         lb.from_directory(inferred_lb_directory)
-        lb.delete_file(section=section, relative_path=file_path,
-                       directory=is_directory)
+        FileOperations.delete_file(lb, section=section, relative_path=file_path)
 
         return DeleteLabbookFile(success=True)
 
@@ -543,7 +563,7 @@ class MoveLabbookFile(graphene.ClientIDMutation):
                                              labbook_name)
         lb = LabBook(author=get_logged_in_author())
         lb.from_directory(inferred_lb_directory)
-        file_info = lb.move_file(section, src_path, dst_path)
+        file_info = FileOperations.move_file(lb, section, src_path, dst_path)
         logger.info(f"Moved file to `{dst_path}`")
 
         # Prime dataloader with labbook you already loaded
@@ -583,7 +603,7 @@ class MakeLabbookDirectory(graphene.ClientIDMutation):
                                              labbook_name)
         lb = LabBook(author=get_logged_in_author())
         lb.from_directory(inferred_lb_directory)
-        lb.makedir(os.path.join(section, directory), create_activity_record=True)
+        FileOperations.makedir(lb, os.path.join(section, directory), create_activity_record=True)
         logger.info(f"Made new directory in `{directory}`")
 
         # Prime dataloader with labbook you already loaded

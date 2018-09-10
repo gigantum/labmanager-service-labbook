@@ -68,7 +68,6 @@ class BuildImage(graphene.relay.ClientIDMutation):
 
         return False
 
-
     @classmethod
     def mutate_and_get_payload(cls, root, info, owner, labbook_name, no_cache=False, client_mutation_id=None):
         username = get_logged_in_username()
