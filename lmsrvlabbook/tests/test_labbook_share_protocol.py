@@ -85,14 +85,15 @@ class TestLabbookShareProtocol(object):
                 labbookName: "labbook1",
                 owner: "default"
             }}) {{
-                success
+                jobKey
             }}
         }}
         """
 
         r = mock_create_labbooks_no_lfs[2].execute(publish_query, context_value=req)
         assert 'errors' not in r
-        assert r['data']['publishLabbook']['success'] is True
+        # TODO - Pause and wait for bg job to finish
+        #assert r['data']['publishLabbook']['success'] is True
 
     @responses.activate
     @patch('lmcommon.workflows.core.create_remote_gitlab_repo', new=_MOCK_create_remote_repo2)
@@ -128,17 +129,13 @@ class TestLabbookShareProtocol(object):
                 labbookName: "labbook1",
                 owner: "default"
             }) {
-                updateCount
-                updatedLabbook {
-                    isRepoClean
-                }
+                jobKey
             }
         }
         """
         r = mock_create_labbooks_no_lfs[2].execute(sync_query, context_value=req)
 
         assert 'errors' not in r
-        assert r['data']['syncLabbook']['updateCount'] == 1
-        assert r['data']['syncLabbook']['updatedLabbook']['isRepoClean'] is True
         assert test_user_lb.active_branch == 'gm.workspace-default'
+        # TODO - Pause and wait for job to report finished
  
