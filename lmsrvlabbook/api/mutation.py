@@ -32,7 +32,7 @@ from lmsrvlabbook.api.mutations import (CreateBranch, CheckoutBranch, CreateLabb
                                         DeleteExperimentalBranch,
                                         MergeFromBranch, WorkonBranch, WriteReadme, AddCustomDocker, RemoveCustomDocker,
                                         DeleteRemoteLabbook,
-                                        CompleteBatchUploadTransaction)
+                                        CompleteBatchUploadTransaction, SetVisibility)
 
 
 class LabbookMutations(graphene.ObjectType):
@@ -155,3 +155,6 @@ class LabbookMutations(graphene.ObjectType):
 
     # Work on a given feature branch (perform a git checkout).
     workon_experimental_branch = WorkonBranch.Field()
+
+    # Set a remote project visibiltiy
+    set_visibility = SetVisibility.Field()
