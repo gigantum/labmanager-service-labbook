@@ -166,6 +166,9 @@ class SetVisibility(graphene.relay.ClientIDMutation):
         mgr = GitLabManager(default_remote, admin_service, access_token=token)
         mgr.configure_git_credentials(default_remote, username)
 
+        if visibility not in ['public', 'private']:
+            raise ValueError(f'Visibility must be either "public" or "private";'
+                             f'("{visibility}" invalid)')
         mgr.set_visibility(namespace=owner, labbook_name=labbook_name, visibility=visibility)
 
         cursor = base64.b64encode(f"{0}".encode('utf-8'))
