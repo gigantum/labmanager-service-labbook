@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import os
+import base64
 import graphene
 
 from lmcommon.configuration import Configuration
@@ -29,6 +30,7 @@ from lmcommon.workflows import GitWorkflow
 from lmsrvcore.api import logged_mutation
 from lmsrvcore.auth.identity import parse_token
 from lmsrvcore.auth.user import get_logged_in_username, get_logged_in_author
+from lmsrvlabbook.api.connections.labbook import LabbookConnection
 from lmsrvlabbook.api.objects.labbook import Labbook as LabbookObject
 
 logger = LMLogger.get_logger()
@@ -127,7 +129,7 @@ class SetVisibility(graphene.relay.ClientIDMutation):
         labbook_name = graphene.String(required=True)
         visibility = graphene.String(required=True)
 
-    success = graphene.Boolean()
+    new_labbook_edge = graphene.Field(LabbookConnection.edge)
 
     @classmethod
     @logged_mutation
@@ -166,4 +168,7 @@ class SetVisibility(graphene.relay.ClientIDMutation):
 
         mgr.set_visibility(namespace=owner, labbook_name=labbook_name, visibility=visibility)
 
-        return SetVisibility(success=True)
+        cursor = base64.b64encode(f"{0}".encode('utf-8'))
+        lbedge = LabbookConnection.Edge(node=LabbookObject(owner=lb.owner['username'], name=labbook_name),
+                                        cursor=cursor)
+        return SetVisibility(new_labbook_edge=lbedge)
