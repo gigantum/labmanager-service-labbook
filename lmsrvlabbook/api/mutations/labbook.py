@@ -214,7 +214,7 @@ class DeleteRemoteLabbook(graphene.ClientIDMutation):
             access_token = flask.g.get('access_token', None)
             id_token = flask.g.get('id_token', None)
             repo_id = mgr.get_repository_id(owner, labbook_name)
-            response = requests.delete(f"https://{index_service}/{repo_id}",
+            response = requests.delete(f"https://{index_service}/index/{repo_id}",
                                        headers={"Authorization": f"Bearer {access_token}",
                                                 "Identity": id_token}, timeout=10)
 

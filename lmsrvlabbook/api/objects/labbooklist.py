@@ -19,13 +19,14 @@
 # SOFTWARE.
 import base64
 import graphene
+import requests
+import flask
 
 from lmsrvlabbook.api.connections.labbook import LabbookConnection, Labbook
 from lmsrvlabbook.api.connections.remotelabbook import RemoteLabbookConnection, RemoteLabbook
 
 from lmcommon.labbook import LabBook
 from lmcommon.configuration import Configuration
-from lmcommon.gitlib.gitlab import GitLabManager
 
 from lmsrvcore.auth.user import get_logged_in_username
 from lmsrvcore.api.connections import ListBasedConnection
@@ -154,14 +155,14 @@ class LabbookList(graphene.ObjectType, interfaces=(graphene.relay.Node,)):
 
         # Get remote server configuration
         default_remote = configuration['git']['default_remote']
-        admin_service = None
+        index_service = None
         for remote in configuration['git']['remotes']:
             if default_remote == remote:
-                admin_service = configuration['git']['remotes'][remote]['admin_service']
+                index_service = configuration['git']['remotes'][remote]['index_service']
                 break
 
-        if not admin_service:
-            raise ValueError('admin_service could not be found')
+        if not index_service:
+            raise ValueError('index_service could not be found')
 
         # Prep arguments
         if "before" in kwargs:
@@ -180,21 +181,38 @@ class LabbookList(graphene.ObjectType, interfaces=(graphene.relay.Node,)):
         else:
             per_page = 20
 
-        # Query backend for data
-        mgr = GitLabManager(default_remote, admin_service, access_token=token)
-        edges = mgr.list_labbooks(order_by=order_by, sort_str=sort, page=page, per_page=per_page)
+        url = f"https://{index_service}/projects?per_page={per_page}&page={page}"
+
+        if order_by is not None:
+            if order_by not in ['name', 'created_on', 'modified_on']:
+                raise ValueError(f"Unsupported order_by: {order_by}. Use `name`, `created_on`, `modified_on`")
+            url = f"{url}&order_by={order_by}"
+        if sort is not None:
+            if sort not in ['desc', 'asc']:
+                raise ValueError(f"Unsupported sort: {sort}. Use `desc`, `asc`")
+            url = f"{url}&sort={sort}"
+
+        # Query SaaS index service for data
+        access_token = flask.g.get('access_token', None)
+        id_token = flask.g.get('id_token', None)
+        response = requests.get(url, headers={"Authorization": f"Bearer {access_token}",
+                                              "Identity": id_token})
+
+        if response.status_code != 200:
+            raise IOError("Failed to retrieve Project listing from remove server")
+        edges = response.json()
         cursors = [base64.b64encode("{}".format(page).encode("UTF-8")).decode("UTF-8") for _ in edges]
 
         # Get Labbook instances
         edge_objs = []
         for edge, cursor in zip(edges, cursors):
-            create_data = {"id": "{}&{}".format(edge["namespace"], edge["labbook_name"]),
-                           "name": edge["labbook_name"],
+            create_data = {"id": "{}&{}".format(edge["namespace"], edge["project"]),
+                           "name": edge["project"],
                            "owner": edge["namespace"],
                            "description": edge["description"],
-                           "creation_date_utc": edge["created_on"],
-                           "modified_date_utc": edge["modified_on"],
-                           "visibility": edge.get("visibility")}
+                           "creation_date_utc": edge["created_at"],
+                           "modified_date_utc": edge["modified_at"],
+                           "visibility": "public" if edge.get("visibility") == "public_project" else "private"}
 
             edge_objs.append(RemoteLabbookConnection.Edge(node=RemoteLabbook(**create_data),
                                                           cursor=cursor))
