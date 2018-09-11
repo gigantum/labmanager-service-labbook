@@ -129,7 +129,7 @@ class SetVisibility(graphene.relay.ClientIDMutation):
         labbook_name = graphene.String(required=True)
         visibility = graphene.String(required=True)
 
-    new_labbook_edge = graphene.Field(LabbookConnection.edge)
+    new_labbook_edge = graphene.Field(LabbookConnection.Edge)
 
     @classmethod
     @logged_mutation
